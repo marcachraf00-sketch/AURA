@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Aura Card</title>
+<style>
+body{
+background:#111;
+color:white;
+font-family:Arial;
+text-align:center;
+padding-top:50px;
+}
+
+.card{
+width:350px;
+margin:auto;
+background:#222;
+padding:30px;
+border-radius:25px;
+}
+
+img{
+width:120px;
+height:120px;
+border-radius:50%;
+}
+
+.bar{
+background:#444;
+height:20px;
+border-radius:20px;
+overflow:hidden;
+}
+
+.progress{
+width:70%;
+height:20px;
+background:#00ff88;
+}
+
+button{
+padding:12px 25px;
+border:none;
+border-radius:15px;
+margin-top:20px;
+font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<img src="https://i.pravatar.cc/150">
+
+<h1>Ahmed</h1>
+
+<p>Level 7</p>
+
+<p>XP: 700 / 1000</p>
+
+<div class="bar">
+<div class="progress"></div>
+</div>
+
+<p>🎵 Listening to: Starboy</p>
+
+<p>⚽ Loves Football</p>
+
+<p>☕ Coffee Addict</p>
+
+<button>Add Friend</button>
+
+</div>
+
+</body>
+</html>
