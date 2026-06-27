@@ -38,14 +38,13 @@
     background: rgba(255, 255, 255, 0.08);
   }
 
-  /* Slide-out Drawer Panel */
   .side-menu {
     position: fixed;
     top: 0;
-    left: -300px; /* Hidden offscreen by default */
+    left: -300px;
     width: 280px;
     height: 100vh;
-    background: rgba(15, 23, 42, 0.8); /* Matching glass color overlay */
+    background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -55,7 +54,6 @@
     transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Active class to slide the drawer out */
   .side-menu.open {
     left: 0;
   }
@@ -130,13 +128,13 @@
 
 <div class="side-menu" id="drawer-menu">
   <div class="menu-options">
-    <div class="menu-item" onclick="alert('Aura is your live real-world experience ranking system synced natively via secure physical NFC technology!')">What is Aura?</div>
-    <div class="menu-item" onclick="window.location.href='profile.html'">Get My Aura Card</div>
+    <div class="menu-item" onclick="window.location.href='what-is-aura.html'">What is Aura?</div>
+    <div class="menu-item" onclick="window.location.href='get-my.aura.card.html'">Get My Aura Card</div>
   </div>
 </div>
 
 <div class="login-container">
-  <h1>Aura Link</h1>
+  <h1>A U R A</h1>
   <input type="email" id="email" placeholder="Email Address">
   <input type="password" id="password" placeholder="Password">
   <button class="submit-btn" id="login-action">Sign In</button>
