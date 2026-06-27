@@ -6,100 +6,42 @@
 <title>Aura Card Login</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial,sans-serif;
-}
-
-body{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:linear-gradient(135deg,#0f172a,#1e1b4b,#000);
-  color:white;
-}
-
-/* Compact Rectangular Card Form Layout */
-.card{
-  width:320px;                      /* Scaled-down compact width */
-  height:480px;                     /* Vertical rectangular height */
-  background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:25px;               
-  padding:25px;                     
-  text-align:center;
-  box-shadow:0 15px 30px rgba(0,0,0,0.5);
-
-  /* Keeps your items perfectly centered in the rectangular frame */
-  display:flex;
-  flex-direction:column;
-  justify-content:center;           
-  align-items:center;               
-}
-
-/* Scaled-down circular brand logo */
-.card-logo {
-  width:65px;                       
-  height:65px;
-  border-radius:50%;                
-  margin-bottom:12px;               
-  object-fit:cover;                 
-}
-
-h1{
-  font-size:24px;
-  margin-bottom:5px;
-}
-
-.subtitle{
-  color:#bdbdbd;
-  margin-bottom:30px;
-}
-
-input{
-  width:100%;
-  padding:15px;
-  margin-bottom:15px;
-  border:none;
-  border-radius:15px;
-  background:#ffffff15;
-  color:white;
-  font-size:16px;
-}
-
-input::placeholder{
-  color:#bdbdbd;
-}
-
-button{
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:15px;
-  font-size:16px;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-.login-btn{
-  background:#00ff88;
-  color:black;
-  font-weight:bold;
-}
-
-.signup-btn{
-  background:#ffffff15;
-  color:white;
-}
-
-#message{
-  margin-top:20px;
-  color:#ff8080;
-}
+  body {
+    background: #0f172a;
+    color: white;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  /* Simple, flat rectangular form card */
+  .card {
+    background: #1e293b;
+    width: 300px;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .card-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  input, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: none;
+    box-sizing: border-box;
+  }
+  input { background: #334155; color: white; }
+  .login-btn { background: #00ff88; color: black; font-weight: bold; cursor: pointer; }
+  .signup-btn { background: transparent; color: #94a3b8; cursor: pointer; }
+  #message { margin-top: 15px; color: #f87171; font-size: 14px; }
 </style>
 </head>
 
