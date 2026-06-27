@@ -43,63 +43,35 @@ button{
   font-size:16px;
   cursor:pointer;
 }
-
-#message{
-  margin-top:20px;
-}
 </style>
 </head>
 
 <body>
 
 <div class="card">
+  <h1>Create Account</h1>
 
-<h1>Create Account</h1>
+  <input id="username" type="text" placeholder="Username">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
 
-<input
-id="username"
-type="text"
-placeholder="Username"
->
+  <button id="createBtn">
+    Create Account
+  </button>
 
-<input
-id="email"
-type="email"
-placeholder="Email"
->
-
-<input
-id="password"
-type="password"
-placeholder="Password"
->
-
-<button onclick="signUp()">
-Create Account
-</button>
-
-<p id="message"></p>
-
+  <p id="message"></p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-```html id="iycm7r"
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-console.log('script started');
-
-const supabase = window.supabase.createClient(
-  'https://zndniherjshrerioqodx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
-);
-
-console.log('supabase created');
-
 function signUp() {
-  alert('signUp function exists');
+  document.getElementById('message').innerText =
+    'Button works!';
 }
+
+document
+  .getElementById('createBtn')
+  .addEventListener('click', signUp);
 </script>
+
 </body>
 </html>
