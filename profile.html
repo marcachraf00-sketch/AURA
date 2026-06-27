@@ -17,54 +17,49 @@
     margin: 0;
   }
 
-  .card {
-    width: 320px;                      
-    height: 480px;                     
-    background: #1e293b;
-    border-radius: 25px;
-    padding: 25px;
+  .profile-wrapper {
+    width: 350px;                      
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    padding: 20px;
     box-sizing: border-box;
   }
 
-  .card img {
+  .profile-wrapper img {
     width: 100%;             
     max-height: 120px;       
     object-fit: cover;       
     border-radius: 15px;     
-    margin-bottom: 15px;     
+    margin-bottom: 20px;     
   }
 
   h1 {
-    font-size: 24px;
+    font-size: 28px;
     margin-bottom: 5px;
+    font-weight: bold;
+    color: white;
   }
 
   .subtitle {
     font-size: 14px;
     color: #bdbdbd;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
   }
 
-  /* Stats Container Layout */
+  /* Layout for the stats with bars */
   .stats-container {
     width: 100%;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
+    text-align: left;
   }
 
-  .stat-row {
+  .stat-item {
+    margin-bottom: 20px;
+  }
+
+  .stat-info {
     display: flex;
     justify-content: space-between;
-    padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     font-size: 15px;
   }
 
@@ -75,6 +70,29 @@
   .stat-value {
     font-weight: bold;
     color: #00ff88;
+  }
+
+  .progress-bar-bg {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.6s ease-out;
+  }
+
+  #level-fill {
+    background: #3b82f6;
+  }
+
+  #xp-fill {
+    background: #00ff88;
   }
 
   button {
@@ -98,31 +116,41 @@
   #loading-msg {
     font-size: 14px;
     color: #bdbdbd;
+    text-align: center;
   }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-  <!-- Exact banner header image placement -->
+<div class="profile-wrapper">
   <img src="logo.png" alt="Aura Card Logo">
 
   <div id="loading-msg">Loading player profile...</div>
 
-  <!-- Profile Content Container -->
   <div id="profile-content" style="display: none; width: 100%;">
-    <h1 id="name">My Aura Card</h1>
+    <h1 id="name">Loading...</h1>
     <p class="subtitle">Verified Aura Operator</p>
 
     <div class="stats-container">
-      <div class="stat-row">
-        <span class="stat-label">Level</span>
-        <span class="stat-value" id="level">1</span>
+      <div class="stat-item">
+        <div class="stat-info">
+          <span class="stat-label">Level</span>
+          <span class="stat-value" id="level">1</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="level-fill"></div>
+        </div>
       </div>
-      <div class="stat-row">
-        <span class="stat-label">XP</span>
-        <span class="stat-value" id="xp">0</span>
+
+      <div class="stat-item">
+        <div class="stat-info">
+          <span class="stat-label">XP</span>
+          <span class="stat-value" id="xp">0</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="xp-fill"></div>
+        </div>
       </div>
     </div>
 
@@ -136,7 +164,6 @@
 (function() {
   if (!window.supabase) return;
 
-  // Swapped API client settings to use your shared app credentials securely
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
@@ -161,15 +188,21 @@
     }
 
     if(data){
-      // Set values matching your custom database row values
+      // 1. Update text displays
       document.getElementById('level').innerText = data.level;
-      document.getElementById('xp').innerText = data.xp;
+      document.getElementById('xp').innerText = data.xp + " XP";
       if (data.username) {
         document.getElementById('name').innerText = data.username;
       }
+
+      const levelPercent = Math.min((data.level / 100) * 100, 100);
+      const xpPercent = Math.min((data.xp / 1000) * 100, 100);
+
+      document.getElementById('level-fill').style.width = levelPercent + "%";
+      document.getElementById('xp-fill').style.width = xpPercent + "%";
     }
 
-    // Hide loader and show layout cleanly
+    // Hide loader and reveal cleaner layout
     document.getElementById('loading-msg').style.display = 'none';
     document.getElementById('profile-content').style.display = 'block';
   }
