@@ -74,9 +74,9 @@
     placeholder="Password"
   >
 
-  <button id="signupButton">
-    Create Account
-  </button>
+<button onclick="signUp()">
+Create Account
+</button>
 
   <p id="message"></p>
 
@@ -99,57 +99,38 @@ document
 async function signUp() {
 
   const username =
-    document.getElementById('username').value.trim();
+    document.getElementById('username').value;
 
   const email =
-    document.getElementById('email').value.trim();
+    document.getElementById('email').value;
 
   const password =
     document.getElementById('password').value;
 
-  if (!username || !email || !password) {
-    document.getElementById('message').innerText =
-      'Please fill in all fields.';
-    return;
-  }
-
   const { data, error } =
     await supabase.auth.signUp({
-      email: email,
-      password: password
+      email,
+      password
     });
 
   if (error) {
     document.getElementById('message').innerText =
       error.message;
-    console.error(error);
     return;
   }
 
-  const { error: profileError } =
-    await supabase
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        username: username,
-        xp: 0,
-        level: 1,
-        avatar_url: ''
-      });
+  await supabase
+    .from('profiles')
+    .insert({
+      id: data.user.id,
+      username: username,
+      xp: 0,
+      level: 1,
+      avatar_url: ''
+    });
 
-  if (profileError) {
-    document.getElementById('message').innerText =
-      profileError.message;
-    console.error(profileError);
-    return;
-  }
-
-  document.getElementById('message').innerText =
-    'Account created successfully!';
-
-  setTimeout(() => {
-    window.location.href = 'profile.html';
-  }, 1000);
+  window.location.href =
+    'profile.html';
 }
 </script>
 
