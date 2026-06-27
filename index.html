@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura Card Login</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f172a,#1e1b4b,#000);
+  color:white;
+}
+
+.card{
+  width:380px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:30px;
+  padding:40px;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,0.5);
+}
+
+.logo{
+  font-size:45px;
+  margin-bottom:15px;
+}
+
+h1{
+  margin-bottom:10px;
+}
+
+.subtitle{
+  color:#bdbdbd;
+  margin-bottom:30px;
+}
+
+input{
+  width:100%;
+  padding:15px;
+  margin-bottom:15px;
+  border:none;
+  border-radius:15px;
+  background:#ffffff15;
+  color:white;
+  font-size:16px;
+}
+
+input::placeholder{
+  color:#bdbdbd;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:15px;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.login-btn{
+  background:#00ff88;
+  color:black;
+  font-weight:bold;
+}
+
+.signup-btn{
+  background:#ffffff15;
+  color:white;
+}
+
+#message{
+  margin-top:20px;
+  color:#ff8080;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="logo">✨</div>
+  <h1>Aura Card</h1>
+  <p class="subtitle">Connect. Collect XP. Level Up.</p>
+
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button class="login-btn" id="submit-login-btn">Login</button>
+  <button class="signup-btn" onclick="window.location.href='signup.html'">Create Account</button>
+
+  <p id="message"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+(function() {
+  // Check window object safely to bypass memory collision errors
+  if (!window.supabase) {
+    console.error("Supabase CDN failed to load properly.");
+    return;
+  }
+
+  // Create client on a locally-scoped variable inside this function
+  const localSupabase = window.supabase.createClient(
+    'https://zndniherjshrerioqodx.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
+  );
+
+  // Attach event listener natively via DOM ID
+  document.getElementById('submit-login-btn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const messageElement = document.getElementById('message');
+
+    messageElement.style.color = "#ff8080";
+
+    if (!email || !password) {
+      messageElement.innerText = "Please fill in all fields.";
+      return;
+    }
+
+    messageElement.innerText = "Logging in...";
+
+    try {
+      const { data, error } = await localSupabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        messageElement.style.color = "#ff8080";
+        messageElement.innerText = error.message;
+      } else {
+        messageElement.style.color = "#00ff88";
+        messageElement.innerText = "Success! Redirecting...";
+        setTimeout(() => {
+          window.location.href = 'profile.html';
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Unexpected runtime rejection:", err);
+      messageElement.innerText = "An error occurred. Check browser console.";
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
