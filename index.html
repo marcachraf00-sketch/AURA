@@ -115,10 +115,31 @@
     font-weight: bold;
     cursor: pointer;
     font-size: 14px;
+    transition: background 0.2s ease;
   }
 
   button.submit-btn:hover {
     background: #2563eb;
+  }
+
+  button.secondary-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: #cbd5e1;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+
+  button.secondary-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
   }
 </style>
 </head>
@@ -137,12 +158,14 @@
   <h1>A U R A</h1>
   <input type="email" id="email" placeholder="Email Address">
   <input type="password" id="password" placeholder="Password">
+  
   <button class="submit-btn" id="login-action">Sign In</button>
+  
+  <button class="secondary-btn" onclick="window.location.href='signup.html'">Create an Account</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Menu Open/Close Toggle Control
   const menuToggle = document.getElementById('menu-toggle');
   const drawerMenu = document.getElementById('drawer-menu');
 
@@ -152,7 +175,6 @@
     menuToggle.innerText = drawerMenu.classList.contains('open') ? '✕' : '☰';
   });
 
-  // Close drawer immediately if user clicks on the main screen background area
   document.addEventListener('click', (e) => {
     if (!drawerMenu.contains(e.target) && e.target !== menuToggle) {
       drawerMenu.classList.remove('open');
@@ -160,7 +182,6 @@
     }
   });
 
-  // Supabase Application Initialization Connection
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
