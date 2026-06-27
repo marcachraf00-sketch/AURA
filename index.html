@@ -40,6 +40,26 @@ publicUrl.publicUrl;
 alert('Photo uploaded!');
 }
 </script>  
+
+await supabase
+.from('profiles')
+.update({
+avatar_url:
+publicUrl.publicUrl
+})
+.eq('id', user.id);
+
+const { data } =
+await supabase
+.from('profiles')
+.select('*')
+.eq('id', user.id)
+.single();
+
+document
+.getElementById('avatar')
+.src =
+data.avatar_url;  
   
 body{
 background:#111;
