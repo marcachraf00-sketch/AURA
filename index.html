@@ -3,176 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aura Card Login</title>
+<title>Aura Link - Home</title>
 
 <style>
   body {
     background: #0f172a;
     color: white;
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    overflow: hidden;
   }
 
-  .card {
-    width: 320px;
-    height: 480px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 25px;
-    padding: 25px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  .menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 100;
+    transition: all 0.2s ease;
+  }
 
+  .menu-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Slide-out Drawer Panel */
+  .side-menu {
+    position: fixed;
+    top: 0;
+    left: -300px; /* Hidden offscreen by default */
+    width: 280px;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.8); /* Matching glass color overlay */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    box-sizing: border-box;
+    padding: 80px 24px 24px 24px;
+    z-index: 99;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Active class to slide the drawer out */
+  .side-menu.open {
+    left: 0;
+  }
+
+  .menu-options {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    gap: 16px;
   }
 
-.card img {
-  width: 100%;
-  max-height: 140px;
-  object-fit: cover;
-  border-radius: 15px;
-  margin-bottom: 15px;
-}
+  .menu-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+    padding: 14px;
+    border-radius: 12px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
 
-  .card-logo {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    margin-bottom: 12px;
-    object-fit: cover;
+  .menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .login-container {
+    width: 320px;
+    text-align: center;
   }
 
   h1 {
-    font-size: 24px;
-    margin-bottom: 5px;
-  }
-
-  .subtitle {
-    font-size: 14px;
-    color: #bdbdbd;
-    margin-bottom: 15px;
-  }
-
-  input, button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-size: 14px;
-    box-sizing: border-box;
+    font-size: 32px;
+    margin-bottom: 30px;
+    letter-spacing: -0.02em;
   }
 
   input {
-    margin-bottom: 10px;
-    background: #ffffff15;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
     color: white;
+    box-sizing: border-box;
   }
 
-  input::placeholder {
-    color: #bdbdbd;
-  }
-
-  button {
-    cursor: pointer;
-    margin-top: 5px;
-  }
-
-  .login-btn {
-    background: #00ff88;
-    color: black;
+  button.submit-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #3b82f6;
+    color: white;
     font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
   }
 
-  .signup-btn {
-    background: transparent;
-    color: #94a3b8;
-  }
-
-  #message {
-    margin-top: 15px;
-    font-size: 13px;
-    color: #ff8080;
+  button.submit-btn:hover {
+    background: #2563eb;
   }
 </style>
 </head>
 <body>
-  
-<div class="card">
-  <img src="logo.png" alt="Aura Card Logo">
 
-  <h1>Aura Card</h1>
-  <p class="subtitle">Connect. Collect XP. Level Up.</p>
+<button class="menu-btn" id="menu-toggle">☰</button>
 
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+<div class="side-menu" id="drawer-menu">
+  <div class="menu-options">
+    <div class="menu-item" onclick="alert('Aura is your live real-world experience ranking system synced natively via secure physical NFC technology!')">What is Aura?</div>
+    <div class="menu-item" onclick="window.location.href='profile.html'">Get My Aura Card</div>
+  </div>
+</div>
 
-  <button class="login-btn" id="submit-login-btn">Login</button>
-  <button class="signup-btn" onclick="window.location.href='signup.html'">Create Account</button>
-
-  <p id="message"></p>
+<div class="login-container">
+  <h1>Aura Link</h1>
+  <input type="email" id="email" placeholder="Email Address">
+  <input type="password" id="password" placeholder="Password">
+  <button class="submit-btn" id="login-action">Sign In</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-(function() {
-  // Check window object safely to bypass memory collision errors
-  if (!window.supabase) {
-    console.error("Supabase CDN failed to load properly.");
-    return;
-  }
+  // Menu Open/Close Toggle Control
+  const menuToggle = document.getElementById('menu-toggle');
+  const drawerMenu = document.getElementById('drawer-menu');
 
-  // Create client on a locally-scoped variable inside this function
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    drawerMenu.classList.toggle('open');
+    menuToggle.innerText = drawerMenu.classList.contains('open') ? '✕' : '☰';
+  });
+
+  // Close drawer immediately if user clicks on the main screen background area
+  document.addEventListener('click', (e) => {
+    if (!drawerMenu.contains(e.target) && e.target !== menuToggle) {
+      drawerMenu.classList.remove('open');
+      menuToggle.innerText = '☰';
+    }
+  });
+
+  // Supabase Application Initialization Connection
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  // Attach event listener natively via DOM ID
-  document.getElementById('submit-login-btn').addEventListener('click', async () => {
+  document.getElementById('login-action').addEventListener('click', async () => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const messageElement = document.getElementById('message');
 
-    messageElement.style.color = "#ff8080";
-
-    if (!email || !password) {
-      messageElement.innerText = "Please fill in all fields.";
-      return;
-    }
-
-    messageElement.innerText = "Logging in...";
-
-    try {
-      const { data, error } = await localSupabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) {
-        messageElement.style.color = "#ff8080";
-        messageElement.innerText = error.message;
-      } else {
-        messageElement.style.color = "#00ff88";
-        messageElement.innerText = "Success! Redirecting...";
-        setTimeout(() => {
-          window.location.href = 'profile.html';
-        }, 1000);
-      }
-    } catch (err) {
-      console.error("Unexpected runtime rejection:", err);
-      messageElement.innerText = "An error occurred. Check browser console.";
+    const { data, error } = await localSupabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert("Error logging in: " + error.message);
+    } else {
+      window.location.href = 'profile.html';
     }
   });
-})();
 </script>
 
 </body>
