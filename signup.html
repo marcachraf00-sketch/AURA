@@ -1,77 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Account</title>
-
-<style>
-body{
-  background:#111827;
-  color:white;
-  font-family:Arial, sans-serif;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
-}
-
-.card{
-  width:350px;
-  background:#1f2937;
-  padding:40px;
-  border-radius:25px;
-  text-align:center;
-}
-
-input{
-  width:100%;
-  padding:15px;
-  margin-bottom:15px;
-  border:none;
-  border-radius:15px;
-  box-sizing:border-box;
-}
-
-button{
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:15px;
-  background:#00ff88;
-  font-size:16px;
-  cursor:pointer;
-}
-</style>
-</head>
-
 <body>
 
-<div class="card">
-  <h1>Create Account</h1>
+<h1>TEST PAGE</h1>
 
-  <input id="username" type="text" placeholder="Username">
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-
-  <button id="createBtn">
-    Create Account
-  </button>
-
-  <p id="message"></p>
-</div>
-
-<script>
-function signUp() {
-  document.getElementById('message').innerText =
-    'Button works!';
-}
-
-document
-  .getElementById('createBtn')
-  .addEventListener('click', signUp);
-</script>
+<button onclick="alert('WORKS')">
+Create Account
+</button>
 
 </body>
 </html>
