@@ -22,39 +22,37 @@ body{
   color:white;
 }
 
+/* Compact Rectangular Card Form Layout */
 .card{
+  width:320px;                      /* Scaled-down compact width */
+  height:480px;                     /* Vertical rectangular height */
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:25px;               
+  padding:25px;                     
+  text-align:center;
+  box-shadow:0 15px 30px rgba(0,0,0,0.5);
 
-  width: 320px;
-  height: 480px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 30px;
-  padding: 40px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;           
-  align-items: center;
+  /* Keeps your items perfectly centered in the rectangular frame */
+  display:flex;
+  flex-direction:column;
+  justify-content:center;           
+  align-items:center;               
 }
 
+/* Scaled-down circular brand logo */
 .card-logo {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  object-fit: cover;
-}  
-
-.logo{
-  font-size:45px;
-  margin-bottom:15px;
+  width:65px;                       
+  height:65px;
+  border-radius:50%;                
+  margin-bottom:12px;               
+  object-fit:cover;                 
 }
 
 h1{
-  margin-bottom:10px;
+  font-size:24px;
+  margin-bottom:5px;
 }
 
 .subtitle{
