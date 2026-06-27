@@ -85,7 +85,7 @@ button{
 
 #message{
   margin-top:20px;
-  color:#00ff88;
+  color:#ff8080;
 }
 </style>
 </head>
@@ -94,126 +94,86 @@ button{
 
 <div class="card">
 
-<div class="logo">✨</div>
+  <div class="logo">✨</div>
 
-<h1>Aura Card</h1>
+  <h1>Aura Card</h1>
 
-<p class="subtitle">
-Connect. Collect XP. Level Up.
-</p>
+  <p class="subtitle">
+    Connect. Collect XP. Level Up.
+  </p>
 
-<input
-id="username"
-type="text"
-placeholder="Username"
->
+  <input
+    id="email"
+    type="email"
+    placeholder="Email"
+  >
 
-<input
-id="email"
-type="email"
-placeholder="Email"
->
+  <input
+    id="password"
+    type="password"
+    placeholder="Password"
+  >
 
-<input
-id="password"
-type="password"
-placeholder="Password"
->
+  <button
+    class="login-btn"
+    onclick="login()">
+    Login
+  </button>
 
-<button
-class="login-btn"
-onclick="login()">
-Login
-</button>
+  <button
+    class="signup-btn"
+    onclick="window.location.href='signup.html'">
+    Create Account
+  </button>
 
-<button
-class="signup-btn"
-onclick="window.location.href='signup.html'">
-Create Account
-</button>
-
-<p id="message"></p>
+  <p id="message"></p>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase =
-window.supabase.createClient(
-'https://zndniherjshrerioqodx.supabase.co',
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
+const supabase = window.supabase.createClient(
+  'https://zndniherjshrerioqodx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
 );
 
-async function signUp(){
+async function login() {
+  try {
+    const email =
+      document.getElementById('email').value.trim();
 
-  const username =
-    document.getElementById('username').value;
+    const password =
+      document.getElementById('password').value;
 
-  const email =
-    document.getElementById('email').value;
+    if (!email || !password) {
+      document.getElementById('message').innerText =
+        'Please enter your email and password.';
+      return;
+    }
 
-  const password =
-    document.getElementById('password').value;
-
-  const { data, error } =
-    await supabase.auth.signUp({
-      email,
-      password
-    });
-
-  if(error){
-    document.getElementById('message').innerText =
-      error.message;
-    return;
-  }
-
-  if(data.user){
-
-    await supabase
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        username: username,
-        xp: 0,
-        level: 1,
-        avatar_url: ''
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
       });
 
+    if (error) {
+      document.getElementById('message').innerText =
+        error.message;
+      return;
+    }
+
+    window.location.href = 'profile.html';
+
+  } catch (err) {
+    console.error(err);
     document.getElementById('message').innerText =
-      'Account created successfully!';
-
-    setTimeout(() => {
-      window.location.href =
-        'profile.html';
-    },1500);
+      'Something went wrong.';
   }
-}
-
-async function login(){
-
-  const email =
-    document.getElementById('email').value;
-
-  const password =
-    document.getElementById('password').value;
-
-  const { error } =
-    await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-  if(error){
-    document.getElementById('message').innerText =
-      error.message;
-    return;
-  }
-
-  window.location.href =
-    'profile.html';
 }
 </script>
 
 </body>
 </html>
+
