@@ -85,74 +85,23 @@ Create Account
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+```html id="iycm7r"
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-console.log('script loaded');
+console.log('script started');
 
 const supabase = window.supabase.createClient(
   'https://zndniherjshrerioqodx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
 );
 
-console.log('supabase loaded');
+console.log('supabase created');
 
-async function signUp() {
-  console.log('signUp clicked');
-
-  const username =
-    document.getElementById('username').value.trim();
-
-  const email =
-    document.getElementById('email').value.trim();
-
-  const password =
-    document.getElementById('password').value;
-
-  if (!username || !email || !password) {
-    document.getElementById('message').innerText =
-      'Please fill in all fields.';
-    return;
-  }
-
-  const { data, error } =
-    await supabase.auth.signUp({
-      email: email,
-      password: password
-    });
-
-  if (error) {
-    console.error(error);
-    document.getElementById('message').innerText =
-      error.message;
-    return;
-  }
-
-  const { error: profileError } =
-    await supabase
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        username: username,
-        xp: 0,
-        level: 1,
-        avatar_url: ''
-      });
-
-  if (profileError) {
-    console.error(profileError);
-    document.getElementById('message').innerText =
-      profileError.message;
-    return;
-  }
-
-  document.getElementById('message').innerText =
-    'Account created successfully!';
-
-  setTimeout(() => {
-    window.location.href = 'profile.html';
-  }, 1000);
+function signUp() {
+  alert('signUp function exists');
 }
 </script>
-
 </body>
 </html>
 ```
