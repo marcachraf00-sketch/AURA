@@ -190,7 +190,7 @@
       document.getElementById('level').innerText = data.level;
       document.getElementById('xp').innerText = data.xp + " XP";
       if (data.username) {
-        document.getElementById('name').innerText = data.username;
+        document.getElementById('username').innerText = data.username;
       }
 
       const levelPercent = Math.min((data.level / 100) * 100, 100);
@@ -200,12 +200,10 @@
       document.getElementById('xp-fill').style.width = xpPercent + "%";
     }
 
-    // Hide loader and reveal cleaner layout
     document.getElementById('loading-msg').style.display = 'none';
     document.getElementById('profile-content').style.display = 'block';
   }
 
-  // Bind log-out button action natively
   document.getElementById('logout-btn').addEventListener('click', async () => {
     await localSupabase.auth.signOut();
     window.location.href = 'index.html';
