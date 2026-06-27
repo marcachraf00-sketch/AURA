@@ -100,7 +100,7 @@ button{
   <input id="email" type="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
 
-  <button class="login-btn" onclick="login()">Login</button>
+  <button class="login-btn" id="submit-login-btn">Login</button>
   <button class="signup-btn" onclick="window.location.href='signup.html'">Create Account</button>
 
   <p id="message"></p>
@@ -109,29 +109,26 @@ button{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// 1. Initialize Supabase safely
-let supabase;
-try {
-  if (window.supabase) {
-    supabase = window.supabase.createClient(
-      'https://zndniherjshrerioqodx.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24pLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
-    );
-  } else {
-    console.error("Supabase failed to load from CDN.");
-  }
-} catch (err) {
-  console.error("Initialization error:", err);
+// 1. Initialize Supabase
+const supabase = window.supabase ? window.supabase.createClient(
+  'https://zndniherjshrerioqodx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
+) : null;
+
+if (!supabase) {
+  console.error("CRITICAL: Supabase library failed to load from the CDN.");
 }
 
-// 2. The Login Function (Now safe from initialization crashes)
-async function login() {
+// 2. Direct Event Listener (Bypasses inline HTML scope issues)
+document.getElementById('submit-login-btn').addEventListener('click', async () => {
+  console.log("Login button clicked!"); // This will show in F12 console to prove it works
+
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const messageElement = document.getElementById('message');
 
   if (!supabase) {
-    messageElement.innerText = "Database connection error. Try reloading.";
+    messageElement.innerText = "Database offline. Check your internet/ad-blocker.";
     return;
   }
 
@@ -140,28 +137,29 @@ async function login() {
     return;
   }
 
-  // Clear previous messages
-  messageElement.innerText = "";
+  messageElement.innerText = "Attempting login...";
 
-  // Authenticate with Supabase
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
-  });
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
 
-  if (error) {
-    // Show error message if login fails
-    messageElement.style.color = "#ff8080";
-    messageElement.innerText = error.message;
-  } else {
-    // Success! Redirect to profile
-    messageElement.style.color = "#00ff88";
-    messageElement.innerText = "Success! Redirecting...";
-    setTimeout(() => {
-      window.location.href = 'profile.html';
-    }, 1000);
+    if (error) {
+      messageElement.style.color = "#ff8080";
+      messageElement.innerText = error.message;
+    } else {
+      messageElement.style.color = "#00ff88";
+      messageElement.innerText = "Success! Redirecting...";
+      setTimeout(() => {
+        window.location.href = 'profile.html';
+      }, 1000);
+    }
+  } catch (err) {
+    messageElement.innerText = "An unexpected error occurred.";
+    console.error(err);
   }
-}
+});
 </script>
 
 </body>
