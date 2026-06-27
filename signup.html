@@ -93,6 +93,7 @@
   <h1>Join AURA</h1>
   <p class="subtitle">Create your unique network account profile</p>
   
+  <input type="text" id="signup-username" placeholder="Username">
   <input type="email" id="signup-email" placeholder="Email Address">
   <input type="tel" id="signup-phone" placeholder="Phone Number (e.g. +2010...)">
   <input type="password" id="signup-password" placeholder="Choose Password">
@@ -106,38 +107,57 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Point straight back to your existing Supabase project cluster
+  // Link connection to your live active Supabase project
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
   document.getElementById('signup-action').addEventListener('click', async () => {
+    const usernameInput = document.getElementById('signup-username').value;
     const email = document.getElementById('signup-email').value;
     const phone = document.getElementById('signup-phone').value;
     const password = document.getElementById('signup-password').value;
 
-    if (!email || !phone || !password) {
-      alert("Please enter all details to proceed with your registration profile setup.");
+    if (!usernameInput || !email || !phone || !password) {
+      alert("Please fill out all registration fields before processing operations.");
       return;
     }
 
-    const { data, error } = await localSupabase.auth.signUp({
+    const { data: authData, error: authError } = await localSupabase.auth.signUp({
       email: email,
-      password: password,
-      options: {
-        data: {
-          phone_number: phone
-        }
-      }
+      password: password
     });
 
-    if (error) {
-      alert("Registration failed: " + error.message);
-    } else {
-      alert("Account generated! Check your email for a confirmation link if required by your settings configuration.");
-      window.location.href = 'profile.html';
+    if (authError) {
+      alert("Authentication identity generation failed: " + authError.message);
+      return;
     }
+
+    const generatedUserId = authData.user?.id;
+
+    if (generatedUserId) {
+      // Step 2: Push row parameters to your custom public data table
+      // Note: Remember to swap 'profiles' out for your actual table name if it's called something else!
+      const { error: tableWriteError } = await localSupabase
+        .from('profiles') 
+        .insert([
+          { 
+            id: generatedUserId,          // Binds data structure to user ID
+            username: usernameInput,      // Maps data securely to your exact 'username' column schema
+            phone: phone,                 // Maps data to your phone column
+            email: email
+          }
+        ]);
+
+      if (tableWriteError) {
+        alert("Auth account built, but data table injection failed: " + tableWriteError.message);
+        return;
+      }
+    }
+
+    alert("Account successfully created and synchronized!");
+    window.location.href = 'profile.html';
   });
 </script>
 
