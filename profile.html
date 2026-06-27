@@ -8,46 +8,52 @@
 <style>
   body {
     background: #0f172a;
-    color: white;
-    font-family: sans-serif;
+    color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    letter-spacing: -0.01em;
   }
 
   .profile-wrapper {
-    width: 350px;                      
+    width: 340px;                      
     text-align: center;
-    padding: 20px;
+    padding: 24px;
     box-sizing: border-box;
   }
 
   .profile-wrapper img {
     width: 100%;             
-    max-height: 120px;       
+    max-height: 110px;       
     object-fit: cover;       
-    border-radius: 15px;     
-    margin-bottom: 20px;     
+    border-radius: 16px;     
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
   }
 
   h1 {
-    font-size: 28px;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: white;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px 0;
+    color: #ffffff;
   }
 
   .subtitle {
-    font-size: 14px;
-    color: #bdbdbd;
-    margin-bottom: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 32px 0;
   }
 
   .stats-container {
     width: 100%;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
     text-align: left;
   }
 
@@ -58,23 +64,27 @@
   .stat-info {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 15px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
   }
 
   .stat-label {
-    color: #bdbdbd;
+    color: #94a3b8;
   }
 
   .stat-value {
-    font-weight: bold;
-    color: #00ff88;
+    font-weight: 600;
   }
 
+  #level-val { color: #38bdf8; }
+  #xp-val { color: #34d399; }
+
+  /* Premium slim neon tracks */
   .progress-bar-bg {
     width: 100%;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
     overflow: hidden;
   }
@@ -83,46 +93,54 @@
     height: 100%;
     border-radius: 10px;
     width: 0%;
-    transition: width 0.6s ease-out;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   #level-fill {
-    background: #3b82f6;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
   }
 
   #xp-fill {
-    background: #00ff88;
+    background: linear-gradient(90deg, #059669, #34d399);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.3);
   }
 
+  /* Minimalist Interactive Logout Button */
   button {
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 14px;
+    font-weight: 600;
     box-sizing: border-box;
     cursor: pointer;
-    background: #ffffff15;
-    color: white;
-    font-weight: bold;
-    transition: background 0.2s;
+    background: rgba(255, 255, 255, 0.03);
+    color: #f1f5f9;
+    transition: all 0.2s ease;
   }
 
   button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
   #loading-msg {
     font-size: 14px;
-    color: #bdbdbd;
+    color: #64748b;
     text-align: center;
+    font-weight: 500;
   }
 </style>
 </head>
 
 <body>
 
-  <div id="loading-msg">Loading player profile...</div>
+<div class="profile-wrapper">
+  <img src="logo.png" alt="Aura Card Logo">
+
+  <div id="loading-msg">Loading identity record...</div>
 
   <div id="profile-content" style="display: none; width: 100%;">
     <h1 id="name">Loading...</h1>
@@ -132,7 +150,7 @@
       <div class="stat-item">
         <div class="stat-info">
           <span class="stat-label">Level</span>
-          <span class="stat-value" id="level">1</span>
+          <span class="stat-value" id="level-val">1</span>
         </div>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" id="level-fill"></div>
@@ -142,7 +160,7 @@
       <div class="stat-item">
         <div class="stat-info">
           <span class="stat-label">XP</span>
-          <span class="stat-value" id="xp">0</span>
+          <span class="stat-value" id="xp-val">0</span>
         </div>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" id="xp-fill"></div>
@@ -184,8 +202,8 @@
     }
 
     if(data){
-      document.getElementById('level').innerText = data.level;
-      document.getElementById('xp').innerText = data.xp + " XP";
+      document.getElementById('level-val').innerText = data.level;
+      document.getElementById('xp-val').innerText = data.xp + " XP";
       
       if (data.username) {
         document.getElementById('name').innerText = data.username;
@@ -196,8 +214,11 @@
       const levelPercent = Math.min((data.level / 100) * 100, 100);
       const xpPercent = Math.min((data.xp / 1000) * 100, 100);
 
-      document.getElementById('level-fill').style.width = levelPercent + "%";
-      document.getElementById('xp-fill').style.width = xpPercent + "%";
+      // Smooth delayed transition load
+      setTimeout(() => {
+        document.getElementById('level-fill').style.width = levelPercent + "%";
+        document.getElementById('xp-fill').style.width = xpPercent + "%";
+      }, 100);
     }
 
     document.getElementById('loading-msg').style.display = 'none';
