@@ -109,26 +109,25 @@ button{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// 1. Initialize Supabase
+// 1. Initialize Supabase safely
 const supabase = window.supabase ? window.supabase.createClient(
   'https://zndniherjshrerioqodx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
 ) : null;
 
 if (!supabase) {
-  console.error("CRITICAL: Supabase library failed to load from the CDN.");
+  console.error("Supabase CDN failed to load.");
 }
 
-// 2. Direct Event Listener (Bypasses inline HTML scope issues)
+// 2. Attach the click event directly to the button via its ID
 document.getElementById('submit-login-btn').addEventListener('click', async () => {
-  console.log("Login button clicked!"); // This will show in F12 console to prove it works
-
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const messageElement = document.getElementById('message');
 
+  // Safety checks
   if (!supabase) {
-    messageElement.innerText = "Database offline. Check your internet/ad-blocker.";
+    messageElement.innerText = "Database connection offline.";
     return;
   }
 
@@ -137,18 +136,21 @@ document.getElementById('submit-login-btn').addEventListener('click', async () =
     return;
   }
 
-  messageElement.innerText = "Attempting login...";
+  messageElement.innerText = "Logging in...";
 
   try {
+    // Authenticate with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
 
     if (error) {
+      // If Supabase rejects the login, show the real reason
       messageElement.style.color = "#ff8080";
       messageElement.innerText = error.message;
     } else {
+      // Success!
       messageElement.style.color = "#00ff88";
       messageElement.innerText = "Success! Redirecting...";
       setTimeout(() => {
@@ -156,8 +158,8 @@ document.getElementById('submit-login-btn').addEventListener('click', async () =
       }, 1000);
     }
   } catch (err) {
-    messageElement.innerText = "An unexpected error occurred.";
-    console.error(err);
+    console.error("Unexpected error:", err);
+    messageElement.innerText = "An error occurred. Check browser console.";
   }
 });
 </script>
