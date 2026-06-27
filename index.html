@@ -109,7 +109,6 @@ button{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// 1. Initialize Supabase safely
 const supabase = window.supabase ? window.supabase.createClient(
   'https://zndniherjshrerioqodx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
@@ -119,7 +118,6 @@ if (!supabase) {
   console.error("Supabase CDN failed to load.");
 }
 
-// 2. Attach the click event directly to the button via its ID
 document.getElementById('submit-login-btn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
