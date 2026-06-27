@@ -1,90 +1,135 @@
-Your AURA is awaiting !
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Aura Card Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura Card Login</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+  linear-gradient(135deg,#0f172a,#1e1b4b,#000);
+  color:white;
+}
+
+.card{
+  width:360px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:30px;
+  padding:40px;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,0.5);
+}
+
+.logo{
+  font-size:40px;
+  margin-bottom:15px;
+}
+
+h1{
+  margin-bottom:10px;
+}
+
+.subtitle{
+  color:#bdbdbd;
+  margin-bottom:35px;
+}
+
+input{
+  width:100%;
+  padding:15px;
+  margin-bottom:15px;
+  border:none;
+  border-radius:15px;
+  background:#ffffff15;
+  color:white;
+  font-size:16px;
+}
+
+input::placeholder{
+  color:#bdbdbd;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:15px;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.login-btn{
+  background:#00ff88;
+  color:black;
+  font-weight:bold;
+}
+
+.signup-btn{
+  background:#ffffff15;
+  color:white;
+}
+
+#message{
+  margin-top:20px;
+  color:#00ff88;
+}
+</style>
 </head>
+
 <body>
 
-<h1>Login</h1>
+<div class="card">
 
-<input id="email" type="email" placeholder="Email">
-<br><br>
+<div class="logo">✨</div>
 
-<input id="password" type="password" placeholder="Password">
-<br><br>
+<h1>Aura Card</h1>
 
-<button onclick="login()">Login</button>
-<button onclick="signUp()">Sign Up</button>
+<p class="subtitle">
+Connect. Collect XP. Level Up.
+</p>
+
+<input
+id="email"
+type="email"
+placeholder="Email"
+>
+
+<input
+id="password"
+type="password"
+placeholder="Password"
+>
+
+<button
+class="login-btn"
+onclick="login()">
+Login
+</button>
+
+<button
+class="signup-btn"
+onclick="signUp()">
+Create Account
+</button>
 
 <p id="message"></p>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const supabase =
-window.supabase.createClient(
-'https://zndniherjshrerioqodx.supabase.co',
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
-);
-
-async function signUp(){
-
-const email =
-document.getElementById('email').value;
-
-const password =
-document.getElementById('password').value;
-
-const { data, error } =
-await supabase.auth.signUp({
-email,
-password
-});
-
-if(error){
-document.getElementById('message').innerText =
-error.message;
-return;
-}
-
-await supabase
-.from('profiles')
-.insert({
-id:data.user.id,
-xp:0,
-level:1,
-avatar_url:''
-});
-
-document.getElementById('message').innerText =
-'Account created!';
-}
-
-async function login(){
-
-const email =
-document.getElementById('email').value;
-
-const password =
-document.getElementById('password').value;
-
-const { error } =
-await supabase.auth.signInWithPassword({
-email,
-password
-});
-
-if(error){
-document.getElementById('message').innerText =
-error.message;
-return;
-}
-
-window.location.href =
-'profile.html';
-}
-</script>
+</div>
 
 </body>
 </html>
