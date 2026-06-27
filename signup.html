@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,11 +10,12 @@
 body{
   background:#111827;
   color:white;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
+  margin:0;
 }
 
 .card{
@@ -30,6 +32,7 @@ input{
   margin-bottom:15px;
   border:none;
   border-radius:15px;
+  box-sizing:border-box;
 }
 
 button{
@@ -40,6 +43,10 @@ button{
   background:#00ff88;
   font-size:16px;
   cursor:pointer;
+}
+
+#message{
+  margin-top:20px;
 }
 </style>
 </head>
@@ -81,39 +88,68 @@ Create Account
 <script>
 const supabase =
 window.supabase.createClient(
-'https://zndniherjshrerioqodx.supabase.co',
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
+  'https://zndniherjshrerioqodx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
 );
 
-async function signUp(){
+async function signUp() {
 
-  // get username, email, password
+  const username =
+    document.getElementById('username').value.trim();
+
+  const email =
+    document.getElementById('email').value.trim();
+
+  const password =
+    document.getElementById('password').value;
+
+  if (!username || !email || !password) {
+    document.getElementById('message').innerText =
+      'Please fill in all fields.';
+    return;
+  }
 
   const { data, error } =
     await supabase.auth.signUp({
-      email,
-      password
+      email: email,
+      password: password
     });
 
-  // Step 5 goes here
-  if(data.user){
-    await supabase
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        username: username,
-        xp: 0,
-        level: 1,
-        avatar_url: ''
-      });
-
-    window.location.href =
-      'profile.html';
+  if (error) {
+    document.getElementById('message').innerText =
+      error.message;
+    return;
   }
-}
-}
+
+  if (data.user) {
+
+    const { error: profileError } =
+      await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          username: username,
+          xp: 0,
+          level: 1,
+          avatar_url: ''
+        });
+
+    if (profileError) {
+      document.getElementById('message').innerText =
+        profileError.message;
+      return;
+    }
+
+    document.getElementById('message').innerText =
+      'Account created successfully!';
+
+    setTimeout(() => {
+      window.location.href = 'profile.html';
+    }, 1000);
+  }
 }
 </script>
 
 </body>
 </html>
+```
