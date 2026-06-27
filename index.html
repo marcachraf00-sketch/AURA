@@ -93,8 +93,26 @@ button{
 <body>
 
 <div class="card">
-  <img src="logo.png" alt="Aura Card Logo" style="width: 380px; height: 580px;">
+  <img src="logo.png" alt="Aura Card Logo">
 
+.card {
+  width: 420px;
+  height: 580px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+  
   <h1>Aura Card</h1>
   <p class="subtitle">Connect. Collect XP. Level Up.</p>
 
