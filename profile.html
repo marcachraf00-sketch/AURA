@@ -51,13 +51,6 @@
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 24px;
-    cursor: pointer;
-    transition: transform 0.1s ease, background 0.2s ease;
-  }
-
-  .profile-wrapper:active {
-    transform: scale(0.98);
-    background: rgba(255, 255, 255, 0.04);
   }
 
   h1 {
@@ -72,10 +65,21 @@
   .subtitle {
     font-size: 11px;
     font-weight: 700;
-    color: #38bdf8;
+    color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     margin: 0 0 40px 0;
+    transition: color 0.3s;
+  }
+
+  .subtitle.nfc-active {
+    color: #00ff88;
+    animation: pulse 1.5s infinite alternate;
+  }
+
+  @keyframes pulse {
+    from { text-shadow: 0 0 4px rgba(0, 255, 136, 0.2); }
+    to { text-shadow: 0 0 12px rgba(0, 255, 136, 0.6); }
   }
 
   .stats-container {
@@ -105,9 +109,8 @@
   }
 
   #level-val { color: #38bdf8; }
-  #xp-val { color: #34d399; transition: color 0.2s; }
+  #xp-val { color: #34d399; }
 
-  /* Premium slim neon tracks */
   .progress-bar-bg {
     width: 100%;
     height: 6px;
@@ -120,7 +123,7 @@
     height: 100%;
     border-radius: 10px;
     width: 0%;
-    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   #level-fill {
@@ -166,12 +169,12 @@
 <img src="logo.png" alt="Background Link" class="bg-fullscreen">
 <div class="bg-overlay"></div>
 
-<div class="profile-wrapper" id="tap-card">
-  <div id="loading-msg">Loading identity record...</div>
+<div class="profile-wrapper">
+  <div id="loading-msg">Connecting to network link...</div>
 
   <div id="profile-content" style="display: none; width: 100%;">
     <h1 id="name">Loading...</h1>
-    <p class="subtitle">Tap Here to Gain +5 XP</p>
+    <p class="subtitle" id="status-sub">Verified Aura Operator</p>
 
     <div class="stats-container">
       <div class="stat-item">
@@ -195,7 +198,7 @@
       </div>
     </div>
 
-    <button id="logout-btn" onclick="event.stopPropagation();">Sign Out</button>
+    <button id="logout-btn">Sign Out</button>
   </div>
 </div>
 
@@ -252,24 +255,29 @@
       }
       
       updateUI();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('source') === 'nfc') {
+        handleNFCTap();
+      }
     }
 
     document.getElementById('loading-msg').style.display = 'none';
     document.getElementById('profile-content').style.display = 'block';
   }
 
-  document.getElementById('tap-card').addEventListener('click', async () => {
-    if (!currentUserId) return;
-
+  async function handleNFCTap() {
+    // 1. Optimistic screen visual change
     currentXP += 5;
-    
     if (currentXP >= 1000) {
       currentXP -= 1000;
       currentLevel += 1;
-      document.getElementById('xp-val').style.color = '#38bdf8';
-      setTimeout(() => document.getElementById('xp-val').style.color = '#34d399', 500);
     }
     updateUI();
+
+    const statusSubtitle = document.getElementById('status-sub');
+    statusSubtitle.innerText = "⚡ NFC Tap Detected: +5 XP Added!";
+    statusSubtitle.classList.add('nfc-active');
 
     const { error } = await localSupabase.rpc('increment_xp', { 
       user_id: currentUserId, 
@@ -277,9 +285,9 @@
     });
 
     if (error) {
-      console.error("Database update error:", error.message);
+      console.error("NFC transaction failed sync:", error.message);
     }
-  });
+  }
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
     await localSupabase.auth.signOut();
