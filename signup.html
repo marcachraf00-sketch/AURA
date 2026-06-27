@@ -86,7 +86,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-window.mySupabase = window.supabase.createClient(
+window.supabase = window.supabase.createClient(
   'https://zndniherjshrerioqodx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
 );
@@ -113,7 +113,7 @@ async function signUp() {
     }
 
     const { data, error } =
-      await mySupabase.auth.signUp({
+      await supabase.auth.signUp({
         email: email,
         password: password
       });
@@ -125,7 +125,7 @@ async function signUp() {
     }
 
     const { error: profileError } =
-      await my.Supabase
+      await supabase
         .from('profiles')
         .insert({
           id: data.user.id,
