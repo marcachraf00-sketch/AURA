@@ -1,252 +1,290 @@
+```html
 <!DOCTYPE html>
 <html>
 <head>
-<title>My Aura Card</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Aura Card</title>
 
-<h2>Create Account</h2>
+  <style>
+    body{
+      background:#111;
+      color:white;
+      font-family:Arial,sans-serif;
+      text-align:center;
+      padding-top:50px;
+    }
 
-<input id="email" type="email" placeholder="Email">
-<br><br>
+    .card{
+      width:350px;
+      margin:auto;
+      background:#222;
+      padding:30px;
+      border-radius:25px;
+    }
 
-<input id="password" type="password" placeholder="Password">
-<br><br>
+    img{
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      object-fit:cover;
+    }
 
-<button onclick="signUp()">Sign Up</button>
+    .bar{
+      background:#444;
+      height:20px;
+      border-radius:20px;
+      overflow:hidden;
+      margin:20px 0;
+    }
 
-<button onclick="login()">Login</button>
+    .progress{
+      width:70%;
+      height:20px;
+      background:#00ff88;
+    }
 
-<br><br>
+    button{
+      padding:12px 25px;
+      border:none;
+      border-radius:15px;
+      margin-top:10px;
+      font-size:16px;
+      cursor:pointer;
+    }
 
-<p id="message"></p>
-
-  
-
-const supabase =
-window.supabase.createClient(...)
-  
- <script>
-async function signUp() {
-
-const email =
-document.getElementById('email').value;
-
-const password =
-document.getElementById('password').value;
-
-const { data, error } =
-await supabase.auth.signUp({
-email: email,
-password: password
-});
-
-if (error) {
-document.getElementById('message').innerText =
-error.message;
-return;
-}
-
-if (data.user) {
-
-await supabase
-.from('profiles')
-.insert({
-id: data.user.id,
-xp: 0,
-level: 1
-});
-
-}
-
-const {
-data: { user }
-} = await supabase.auth.getUser();  
-  
-document.getElementById('message').innerText =
-'Account created! Check your email.';
-}
-
-async function login() {
-
-const email =
-document.getElementById('email').value;
-
-const password =
-document.getElementById('password').value;
-
-const { data, error } =
-await supabase.auth.signInWithPassword({
-email: email,
-password: password
-});
-
-if (error) {
-document.getElementById('message').innerText =
-error.message;
-return;
-}
-
-document.getElementById('message').innerText =
-'Logged in successfully!';
-}
-</script> 
-
-<script>
-async function getUser() {
-
-const {
-data: { user }
-} = await supabase.auth.getUser();
-
-console.log(user);
-
-}
-getUser();
-</script>  
-  
-<script>
-async function uploadAvatar() {
-
-const file =
-document.getElementById('avatarInput')
-.files[0];
-
-if (!file) {
-alert('Choose a photo');
-return;
-}
-
-const fileName =
-Date.now() + "-" + file.name;
-
-const { data, error } =
-await supabase.storage
-.from('avatars')
-.upload(fileName, file);
-
-if (error) {
-alert(error.message);
-return;
-}
-
-const { data: publicUrl } =
-supabase.storage
-.from('avatars')
-.getPublicUrl(fileName);
-
-document.getElementById('avatar').src =
-publicUrl.publicUrl;
-
-alert('Photo uploaded!');
-}
-</script>  
-
-await supabase
-.from('profiles')
-.update({
-avatar_url:
-publicUrl.publicUrl
-})
-.eq('id', user.id);
-
-const { data } =
-await supabase
-.from('profiles')
-.select('*')
-.eq('id', user.id)
-.single();
-
-document
-.getElementById('avatar')
-.src =
-data.avatar_url;  
-  
-body{
-background:#111;
-color:white;
-font-family:Arial;
-text-align:center;
-padding-top:50px;
-}
-
-.card{
-width:350px;
-margin:auto;
-background:#222;
-padding:30px;
-border-radius:25px;
-}
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<script>
-const supabase = window.supabase.createClient(
-'https://zndniherjshrerioqodx.supabase.co',
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
-);
-</script>
-
-<input type="file" id="avatarInput">
-<button onclick="uploadAvatar()">Upload Photo</button>
-
-<br><br>
-
-<img id="avatar" width="200">
-  
-img{
-width:120px;
-height:120px;
-border-radius:50%;
-}
-
-.bar{
-background:#444;
-height:20px;
-border-radius:20px;
-overflow:hidden;
-}
-
-.progress{
-width:70%;
-height:20px;
-background:#00ff88;
-}
-
-button{
-padding:12px 25px;
-border:none;
-border-radius:15px;
-margin-top:20px;
-font-size:18px;
-}
-</style>
+    input{
+      padding:10px;
+      width:250px;
+      border-radius:10px;
+      border:none;
+      margin-bottom:10px;
+    }
+  </style>
 </head>
-
 <body>
 
 <div class="card">
 
-<img src="https://i.pravatar.cc/150">
+  <h2>Create Account</h2>
 
-<h1>Ahmed</h1>
+  <input
+    id="email"
+    type="email"
+    placeholder="Email"
+  >
 
-<p>Level 7</p>
+  <br>
 
-<p>XP: 700 / 1000</p>
+  <input
+    id="password"
+    type="password"
+    placeholder="Password"
+  >
 
-<div class="bar">
-<div class="progress"></div>
+  <br>
+
+  <button onclick="signUp()">
+    Sign Up
+  </button>
+
+  <button onclick="login()">
+    Login
+  </button>
+
+  <p id="message"></p>
+
+  <br>
+
+  <input
+    type="file"
+    id="avatarInput"
+    accept="image/*"
+  >
+
+  <br>
+
+  <button onclick="uploadAvatar()">
+    Upload Photo
+  </button>
+
+  <br><br>
+
+  <img
+    id="avatar"
+    src="https://i.pravatar.cc/150"
+  >
+
+  <h1>Ahmed</h1>
+
+  <p>Level: 1</p>
+
+  <p>XP: 0 / 1000</p>
+
+  <div class="bar">
+    <div class="progress"></div>
+  </div>
+
+  <p>🎵 Listening to: Starboy</p>
+
+  <p>⚽ Loves Football</p>
+
+  <p>☕ Coffee Addict</p>
+
 </div>
 
-<p>🎵 Listening to: Starboy</p>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<p>⚽ Loves Football</p>
+<script>
+const supabase =
+window.supabase.createClient(
+  'https://zndniherjshrerioqodx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
+);
 
-<p>☕ Coffee Addict</p>
+async function signUp() {
 
-<button>Add Friend</button>
+  const email =
+    document.getElementById('email').value;
 
-</div>
+  const password =
+    document.getElementById('password').value;
+
+  const { data, error } =
+    await supabase.auth.signUp({
+      email,
+      password
+    });
+
+  if (error) {
+    document.getElementById('message').innerText =
+      error.message;
+    return;
+  }
+
+  if (data.user) {
+
+    await supabase
+      .from('profiles')
+      .insert({
+        id: data.user.id,
+        xp: 0,
+        level: 1,
+        avatar_url: ''
+      });
+
+  }
+
+  document.getElementById('message').innerText =
+    'Account created! Check your email.';
+}
+
+async function login() {
+
+  const email =
+    document.getElementById('email').value;
+
+  const password =
+    document.getElementById('password').value;
+
+  const { error } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    document.getElementById('message').innerText =
+      error.message;
+    return;
+  }
+
+  document.getElementById('message').innerText =
+    'Logged in successfully!';
+
+  loadProfile();
+}
+
+async function uploadAvatar() {
+
+  const file =
+    document.getElementById('avatarInput')
+    .files[0];
+
+  if (!file) {
+    alert('Choose a photo');
+    return;
+  }
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    alert('Please login first.');
+    return;
+  }
+
+  const fileName =
+    user.id + "-" + Date.now();
+
+  const { error } =
+    await supabase.storage
+      .from('avatars')
+      .upload(fileName, file);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  const { data } =
+    supabase.storage
+      .from('avatars')
+      .getPublicUrl(fileName);
+
+  const publicUrl =
+    data.publicUrl;
+
+  document.getElementById('avatar').src =
+    publicUrl;
+
+  await supabase
+    .from('profiles')
+    .update({
+      avatar_url: publicUrl
+    })
+    .eq('id', user.id);
+
+  alert('Photo uploaded!');
+}
+
+async function loadProfile() {
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data, error } =
+    await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+  if (error) return;
+
+  if (data.avatar_url) {
+    document.getElementById('avatar').src =
+      data.avatar_url;
+  }
+}
+
+loadProfile();
+</script>
 
 </body>
 </html>
+```
