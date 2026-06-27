@@ -138,40 +138,10 @@ const supabase = window.supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
 );
 
-async function login() {
-  try {
-    const email =
-      document.getElementById('email').value.trim();
-
-    const password =
-      document.getElementById('password').value;
-
-    if (!email || !password) {
-      document.getElementById('message').innerText =
-        'Please enter your email and password.';
-      return;
-    }
-
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-    if (error) {
-      document.getElementById('message').innerText =
-        error.message;
-      return;
-    }
-
-    window.location.href = 'profile.html';
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('message').innerText =
-      'Something went wrong.';
-  }
+function login() {
+  window.location.href = 'profile.html';
 }
+
 </script>
 
 </body>
