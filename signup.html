@@ -87,41 +87,30 @@ window.supabase.createClient(
 
 async function signUp(){
 
-const username =
-document.getElementById('username').value;
+  // get username, email, password
 
-const email =
-document.getElementById('email').value;
+  const { data, error } =
+    await supabase.auth.signUp({
+      email,
+      password
+    });
 
-const password =
-document.getElementById('password').value;
+  // Step 5 goes here
+  if(data.user){
+    await supabase
+      .from('profiles')
+      .insert({
+        id: data.user.id,
+        username: username,
+        xp: 0,
+        level: 1,
+        avatar_url: ''
+      });
 
-const { data, error } =
-await supabase.auth.signUp({
-email,
-password
-});
-
-if(error){
-document.getElementById('message').innerText =
-error.message;
-return;
+    window.location.href =
+      'profile.html';
+  }
 }
-
-if(data.user){
-
-await supabase
-.from('profiles')
-.insert({
-id:data.user.id,
-username:username,
-xp:0,
-level:1,
-avatar_url:''
-});
-
-window.location.href =
-'profile.html';
 }
 }
 </script>
