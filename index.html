@@ -109,6 +109,7 @@ button{
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+// 1. Initialize Supabase Client
 const supabase = window.supabase ? window.supabase.createClient(
   'https://zndniherjshrerioqodx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
@@ -118,10 +119,14 @@ if (!supabase) {
   console.error("Supabase CDN failed to load.");
 }
 
+// 2. Setup Login Event Listener
 document.getElementById('submit-login-btn').addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const messageElement = document.getElementById('message');
+
+  // Reset text properties
+  messageElement.style.color = "#ff8080";
 
   // Safety checks
   if (!supabase) {
@@ -137,18 +142,18 @@ document.getElementById('submit-login-btn').addEventListener('click', async () =
   messageElement.innerText = "Logging in...";
 
   try {
-    // Authenticate with Supabase
+    // Authenticate user credentials via Supabase Auth
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
 
     if (error) {
-      // If Supabase rejects the login, show the real reason
+      // Display rejection details directly into the UI
       messageElement.style.color = "#ff8080";
       messageElement.innerText = error.message;
     } else {
-      // Success!
+      // Success routine
       messageElement.style.color = "#00ff88";
       messageElement.innerText = "Success! Redirecting...";
       setTimeout(() => {
@@ -156,7 +161,7 @@ document.getElementById('submit-login-btn').addEventListener('click', async () =
       }, 1000);
     }
   } catch (err) {
-    console.error("Unexpected error:", err);
+    console.error("Unexpected error execution:", err);
     messageElement.innerText = "An error occurred. Check browser console.";
   }
 });
