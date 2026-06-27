@@ -123,11 +123,12 @@
 <body>
 
 <div class="profile-wrapper">
+  <img src="logo.png" alt="Aura Card Logo">
 
   <div id="loading-msg">Loading player profile...</div>
 
   <div id="profile-content" style="display: none; width: 100%;">
-    <h1 id="username">Loading...</h1>
+    <h1 id="name">Loading...</h1>
     <p class="subtitle">Verified Aura Operator</p>
 
     <div class="stats-container">
@@ -186,11 +187,13 @@
     }
 
     if(data){
-      // 1. Update text displays
       document.getElementById('level').innerText = data.level;
       document.getElementById('xp').innerText = data.xp + " XP";
+      
       if (data.username) {
-        document.getElementById('username').innerText = data.username;
+        document.getElementById('name').innerText = data.username;
+      } else {
+        document.getElementById('name').innerText = user.email.split('@')[0];
       }
 
       const levelPercent = Math.min((data.level / 100) * 100, 100);
