@@ -1,13 +1,156 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+
+  <style>
+    body{
+      background:#111827;
+      color:white;
+      font-family:Arial,sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      margin:0;
+    }
+
+    .card{
+      width:350px;
+      background:#1f2937;
+      padding:40px;
+      border-radius:25px;
+      text-align:center;
+    }
+
+    input{
+      width:100%;
+      padding:15px;
+      margin-bottom:15px;
+      border:none;
+      border-radius:15px;
+      box-sizing:border-box;
+    }
+
+    button{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:15px;
+      background:#00ff88;
+      font-size:16px;
+      cursor:pointer;
+    }
+
+    #message{
+      margin-top:20px;
+      color:#00ff88;
+    }
+  </style>
+</head>
 <body>
 
-<h1>Test</h1>
+<div class="card">
+
+  <h1>Create Account</h1>
+
+  <input
+    id="username"
+    type="text"
+    placeholder="Username"
+  >
+
+  <input
+    id="email"
+    type="email"
+    placeholder="Email"
+  >
+
+  <input
+    id="password"
+    type="password"
+    placeholder="Password"
+  >
+
+  <button id="signupButton">
+    Create Account
+  </button>
+
+  <p id="message"></p>
+
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-console.log(window.supabase);
+console.log('Script loaded');
+
+const supabase = window.supabase.createClient(
+  'https://zndniherjshrerioqodx.supabase.co',
+  'sb_publishable_05Q16pQ-1SG9kdzch-eHPg_UA7hWdrl'
+);
+
+document
+  .getElementById('signupButton')
+  .addEventListener('click', signUp);
+
+async function signUp() {
+
+  const username =
+    document.getElementById('username').value.trim();
+
+  const email =
+    document.getElementById('email').value.trim();
+
+  const password =
+    document.getElementById('password').value;
+
+  if (!username || !email || !password) {
+    document.getElementById('message').innerText =
+      'Please fill in all fields.';
+    return;
+  }
+
+  const { data, error } =
+    await supabase.auth.signUp({
+      email: email,
+      password: password
+    });
+
+  if (error) {
+    document.getElementById('message').innerText =
+      error.message;
+    console.error(error);
+    return;
+  }
+
+  const { error: profileError } =
+    await supabase
+      .from('profiles')
+      .insert({
+        id: data.user.id,
+        username: username,
+        xp: 0,
+        level: 1,
+        avatar_url: ''
+      });
+
+  if (profileError) {
+    document.getElementById('message').innerText =
+      profileError.message;
+    console.error(profileError);
+    return;
+  }
+
+  document.getElementById('message').innerText =
+    'Account created successfully!';
+
+  setTimeout(() => {
+    window.location.href = 'profile.html';
+  }, 1000);
+}
 </script>
 
 </body>
