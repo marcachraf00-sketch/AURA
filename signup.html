@@ -54,81 +54,66 @@
 <body>
 
 <div class="card">
-
   <h1>Create Account</h1>
 
-  <input
-    id="username"
-    type="text"
-    placeholder="Username"
-  >
+  <input id="username" type="text" placeholder="Username">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
 
-  <input
-    id="email"
-    type="email"
-    placeholder="Email"
-  >
-
-  <input
-    id="password"
-    type="password"
-    placeholder="Password"
-  >
-
-  <button id="signupButton">
-    Create Account
-  </button>
-
+  <button id="signupButton">Create Account</button>
   <p id="message"></p>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>  
-console.log(window.supabase);  
-console.log('script loaded');
- 
-const supabase = window.supabase.createClient(
-  'https://zndniherjshrerioqodx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
-);
+<script>
+(function() {
+  if (!window.supabase) {
+    console.error("Supabase CDN failed to load properly.");
+    return;
+  }
 
-document
-  .getElementById('signupButton')
-  .addEventListener('click', signUp);
+  // Create client on a locally-scoped variable to avoid memory collisions
+  const localSupabase = window.supabase.createClient(
+    'https://zndniherjshrerioqodx.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
+  );
 
-async function signUp() {
-  try {
-    const username =
-      document.getElementById('username').value.trim();
+  document.getElementById('signupButton').addEventListener('click', async () => {
+    const messageElement = document.getElementById('message');
+    messageElement.style.color = "#ff8080"; // Default error color
 
-    const email =
-      document.getElementById('email').value.trim();
-
-    const password =
-      document.getElementById('password').value;
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
 
     if (!username || !email || !password) {
-      document.getElementById('message').innerText =
-        'Please fill in all fields.';
+      messageElement.innerText = 'Please fill in all fields.';
       return;
     }
 
-    const { data, error } =
-      await supabase.auth.signUp({
+    messageElement.innerText = 'Creating account...';
+
+    try {
+      // 1. Sign up user via Supabase Auth
+      const { data, error } = await localSupabase.auth.signUp({
         email: email,
         password: password
       });
 
-    if (error) {
-      document.getElementById('message').innerText =
-        error.message;
-      return;
-    }
+      if (error) {
+        messageElement.innerText = error.message;
+        return;
+      }
 
-    const { error: profileError } =
-      await supabase
+      // Check if user object was successfully created (or if email verification paused it)
+      if (!data.user) {
+        messageElement.innerText = "Please check your email to confirm registration.";
+        return;
+      }
+
+      // 2. Insert custom row into profiles table safely
+      const { error: profileError } = await localSupabase
         .from('profiles')
         .insert({
           id: data.user.id,
@@ -138,20 +123,24 @@ async function signUp() {
           avatar_url: ''
         });
 
-    if (profileError) {
-      document.getElementById('message').innerText =
-        profileError.message;
-      return;
+      if (profileError) {
+        messageElement.innerText = "Auth setup worked, but profile creation failed: " + profileError.message;
+        return;
+      }
+
+      // 3. Success routine
+      messageElement.style.color = "#00ff88";
+      messageElement.innerText = "Account created! Redirecting...";
+      setTimeout(() => {
+        window.location.href = 'profile.html';
+      }, 1500);
+
+    } catch (err) {
+      console.error(err);
+      messageElement.innerText = 'Something went wrong. Check developer console.';
     }
-
-    window.location.href = 'profile.html';
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('message').innerText =
-      'Something went wrong.';
-  }
-}
+  });
+})();
 </script>
 
 </body>
