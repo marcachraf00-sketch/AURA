@@ -3,6 +3,44 @@
 <head>
 <title>My Aura Card</title>
 <style>
+
+<script>
+async function uploadAvatar() {
+
+const file =
+document.getElementById('avatarInput')
+.files[0];
+
+if (!file) {
+alert('Choose a photo');
+return;
+}
+
+const fileName =
+Date.now() + "-" + file.name;
+
+const { data, error } =
+await supabase.storage
+.from('avatars')
+.upload(fileName, file);
+
+if (error) {
+alert(error.message);
+return;
+}
+
+const { data: publicUrl } =
+supabase.storage
+.from('avatars')
+.getPublicUrl(fileName);
+
+document.getElementById('avatar').src =
+publicUrl.publicUrl;
+
+alert('Photo uploaded!');
+}
+</script>  
+  
 body{
 background:#111;
 color:white;
@@ -19,6 +57,22 @@ padding:30px;
 border-radius:25px;
 }
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+'https://zndniherjshrerioqodx.supabase.co',
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
+);
+</script>
+
+<input type="file" id="avatarInput">
+<button onclick="uploadAvatar()">Upload Photo</button>
+
+<br><br>
+
+<img id="avatar" width="200">
+  
 img{
 width:120px;
 height:120px;
