@@ -1,146 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Account</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A U R A - Sign Up</title>
 
-  <style>
-    body{
-      background:#111827;
-      color:white;
-      font-family:Arial, sans-serif;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      margin:0;
-    }
+<style>
+  body {
+    background: #0f172a;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
 
-    .card{
-      width:350px;
-      background:#1f2937;
-      padding:40px;
-      border-radius:25px;
-      text-align:center;
-    }
+  .signup-container {
+    width: 320px;
+    text-align: center;
+  }
 
-    input{
-      width:100%;
-      padding:15px;
-      margin-bottom:15px;
-      border:none;
-      border-radius:15px;
-      box-sizing:border-box;
-      font-size:16px;
-    }
+  h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
 
-    button{
-      width:100%;
-      padding:15px;
-      border:none;
-      border-radius:15px;
-      background:#00ff88;
-      font-size:16px;
-      cursor:pointer;
-    }
+  .subtitle {
+    color: #94a3b8;
+    font-size: 14px;
+    margin: 0 0 30px 0;
+  }
 
-    #message{
-      margin-top:20px;
-      color:#ff8080;
-    }
-  </style>
+  input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    color: white;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #34d399;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  button.submit-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #34d399;
+    color: #0f172a;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+  }
+
+  button.submit-btn:hover {
+    background: #10b981;
+  }
+
+  .footer-links {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .footer-links a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
+</style>
 </head>
 <body>
 
-<div class="card">
-  <h1>Create Account</h1>
+<div class="signup-container">
+  <h1>Join AURA</h1>
+  <p class="subtitle">Create your unique network account profile</p>
+  
+  <input type="email" id="signup-email" placeholder="Email Address">
+  <input type="tel" id="signup-phone" placeholder="Phone Number (e.g. +2010...)">
+  <input type="password" id="signup-password" placeholder="Choose Password">
+  
+  <button class="submit-btn" id="signup-action">Register Account</button>
 
-  <input id="username" type="text" placeholder="Username">
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-
-  <button id="signupButton">Create Account</button>
-  <p id="message"></p>
+  <div class="footer-links">
+    Already have an account? <a href="index.html">Sign In</a>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-(function() {
-  if (!window.supabase) {
-    console.error("Supabase CDN failed to load properly.");
-    return;
-  }
-
-  // Create client on a locally-scoped variable to avoid memory collisions
+  // Point straight back to your existing Supabase project cluster
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  document.getElementById('signupButton').addEventListener('click', async () => {
-    const messageElement = document.getElementById('message');
-    messageElement.style.color = "#ff8080"; // Default error color
+  document.getElementById('signup-action').addEventListener('click', async () => {
+    const email = document.getElementById('signup-email').value;
+    const phone = document.getElementById('signup-phone').value;
+    const password = document.getElementById('signup-password').value;
 
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-
-    if (!username || !email || !password) {
-      messageElement.innerText = 'Please fill in all fields.';
+    if (!email || !phone || !password) {
+      alert("Please enter all details to proceed with your registration profile setup.");
       return;
     }
 
-    messageElement.innerText = 'Creating account...';
-
-    try {
-      // 1. Sign up user via Supabase Auth
-      const { data, error } = await localSupabase.auth.signUp({
-        email: email,
-        password: password
-      });
-
-      if (error) {
-        messageElement.innerText = error.message;
-        return;
+    const { data, error } = await localSupabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          phone_number: phone
+        }
       }
+    });
 
-      // Check if user object was successfully created (or if email verification paused it)
-      if (!data.user) {
-        messageElement.innerText = "Please check your email to confirm registration.";
-        return;
-      }
-
-      // 2. Insert custom row into profiles table safely
-      const { error: profileError } = await localSupabase
-        .from('profiles')
-        .insert({
-          id: data.user.id,
-          username: username,
-          xp: 0,
-          level: 1,
-          avatar_url: ''
-        });
-
-      if (profileError) {
-        messageElement.innerText = "Auth setup worked, but profile creation failed: " + profileError.message;
-        return;
-      }
-
-      // 3. Success routine
-      messageElement.style.color = "#00ff88";
-      messageElement.innerText = "Account created! Redirecting...";
-      setTimeout(() => {
-        window.location.href = 'profile.html';
-      }, 1500);
-
-    } catch (err) {
-      console.error(err);
-      messageElement.innerText = 'Something went wrong. Check developer console.';
+    if (error) {
+      alert("Registration failed: " + error.message);
+    } else {
+      alert("Account generated! Check your email for a confirmation link if required by your settings configuration.");
+      window.location.href = 'profile.html';
     }
   });
-})();
 </script>
 
 </body>
