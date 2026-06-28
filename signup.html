@@ -67,6 +67,7 @@
     border-color: #3b82f6;
   }
 
+  /* Highlight wrapper for the gatekeeper input */
   .code-group {
     margin-bottom: 20px;
     background: rgba(244, 114, 182, 0.02);
@@ -136,6 +137,9 @@
       <small class="code-help-text">🔑 Received manually upon delivery verification payment check.</small>
     </div>
 
+    <label for="user-name">Full Name</label>
+    <input type="text" id="user-name" placeholder="John Doe" required>
+
     <label for="user-email">Email Address</label>
     <input type="email" id="user-email" placeholder="name@example.com" required>
 
@@ -162,6 +166,7 @@
     event.preventDefault();
     
     const inviteCode = document.getElementById('invite-code').value.trim();
+    const fullName = document.getElementById('user-name').value.trim();
     const emailStr = document.getElementById('user-email').value;
     const passwordStr = document.getElementById('user-password').value;
 
@@ -180,6 +185,11 @@
     const { data: authData, error: authError } = await localSupabase.auth.signUp({
       email: emailStr,
       password: passwordStr,
+      options: {
+        data: {
+          full_name: fullName // This saves the name directly into user metadata
+        }
+      }
     });
 
     if (authError) {
