@@ -882,7 +882,7 @@
     document.getElementById('device-file-input').click();
   });
 
-  /* OPTIMIZED EMBEDDED CANVAS COMPRESSION FILTER ENGINE */
+  /* CANVAS COMPRESSION FILTER */
   document.getElementById('device-file-input').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -915,9 +915,8 @@
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Compress and extract tiny Base64 data string payload
         tempBase64Avatar = canvas.toDataURL('image/jpeg', 0.7);
-        document.getElementById('upload-avatar-click').innerText = "✅ Image Scaled & Compressed";
+        document.getElementById('upload-avatar-click').innerText = "✅ Image Compressed Perfectly";
       };
       img.src = event.target.result;
     };
@@ -1068,6 +1067,7 @@
     document.getElementById('edit-modal').style.display = 'none';
   });
 
+  /* FIXED DATA PERSISTENCE CONTEXT (UPSERT ENGINE + CONSOLE DEBUGGING) */
   document.getElementById('save-profile-btn').addEventListener('click', async () => {
     const nameVal = document.getElementById('edit-username').value.trim();
     const ageVal = parseInt(document.getElementById('edit-age').value) || null;
@@ -1084,13 +1084,21 @@
     renderInterests(selectedInterests);
     document.getElementById('edit-modal').style.display = 'none';
 
-    await localSupabase.from('profiles').upsert({
-      id: currentUserId,
+    // Using .upsert ensures the row is either inserted or completely overridden cleanly matching on the primary key id
+    const { error } = await localSupabase.from('profiles').upsert({
+      id: currentUserId, 
       username: nameVal,
       age: ageVal,
       avatar_url: tempBase64Avatar,
       interests: selectedInterests
-    }).eq('id', currentUserId);
+    });
+
+    if (error) {
+      console.error("❌ SUPABASE WRITE DIRECT REJECTION ERROR:", error.message, error.details);
+      alert("Profile Sync Failed: " + error.message + "\nCheck browser Console tab for database logs.");
+    } else {
+      console.log("✅ Profile row synced successfully to database cloud mesh.");
+    }
   });
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
