@@ -112,6 +112,7 @@
     to { text-shadow: 0 0 12px rgba(0, 255, 136, 0.6); }
   }
 
+  /* Interests Section */
   .interests-section {
     text-align: left;
     margin-bottom: 28px;
@@ -150,7 +151,6 @@
     font-style: italic;
   }
 
-  /* Stats Elements */
   .stats-container {
     width: 100%;
     margin-bottom: 30px;
@@ -246,6 +246,7 @@
     font-weight: 500;
   }
 
+  /* Modal Styles */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -329,4 +330,65 @@
     </div>
 
     <div class="stats-container">
-      <div class="stat-
+      <div class="stat-item">
+        <div class="stat-info">
+          <span class="stat-label">Level</span>
+          <span class="stat-value" id="level-val">1</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="level-fill"></div>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-info">
+          <span class="stat-label">XP</span>
+          <span class="stat-value" id="xp-val">0 / 200 XP</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="xp-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="primary-btn" id="edit-profile-btn">Edit Profile</button>
+      <button id="logout-btn">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <h3>Update Operator Identity</h3>
+    
+    <label for="edit-username">Display Name</label>
+    <input type="text" id="edit-username" placeholder="Change username">
+
+    <label for="edit-age">Age</label>
+    <input type="number" id="edit-age" placeholder="Enter age" min="1" max="120">
+
+    <label for="edit-avatar">Profile Picture Image URL</label>
+    <input type="text" id="edit-avatar" placeholder="https://example.com/photo.jpg">
+
+    <label for="edit-interests">Interests (Comma Separated)</label>
+    <input type="text" id="edit-interests" placeholder="Networking, Tech, Marketing, Design">
+
+    <div class="btn-group" style="margin-top: 10px;">
+      <button class="primary-btn" id="save-profile-btn">Save Identity</button>
+      <button id="close-modal-btn" style="background:transparent; border-color:transparent; color:#64748b;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function() {
+  if (!window.supabase) {
+    document.getElementById('loading-msg').innerText = "Failed to load Supabase SDK.";
+    return;
+  }
+
+  const localSupabase = window.supabase.createClient(
+    'https://zndniherjshrerioqodx.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIy
