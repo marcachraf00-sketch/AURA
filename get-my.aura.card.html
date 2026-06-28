@@ -98,7 +98,7 @@
   }
 
   .product-card {
-    background: rgba(15, 23, 42, 0.95); /* darker base background to make effects pop */
+    background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     padding: 20px;
@@ -120,13 +120,8 @@
     box-shadow: 0 12px 24px -10px rgba(59, 130, 246, 0.15);
   }
 
-  .product-card.girly-exclusive {
-    border: none;
-  }
-
   .exclusive-glow-wrapper:hover {
     transform: translateY(-6px);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 0 35px rgba(244, 114, 182, 0.45);
   }
 
@@ -194,26 +189,24 @@
     text-align: left;
   }
 
-  input, textarea {
+  select, textarea {
     width: 100%;
     padding: 14px;
     margin-bottom: 16px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.02);
+    background: #1e293b;
     color: white;
     box-sizing: border-box;
     font-size: 14px;
     font-family: inherit;
   }
 
-  input:focus, textarea:focus {
+  textarea:focus, select:focus {
     outline: none;
     border-color: #3b82f6;
-    background: rgba(255, 255, 255, 0.04);
   }
 
-  /* Buttons */
   button {
     width: 100%;
     padding: 12px;
@@ -262,6 +255,38 @@
     padding-bottom: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
+
+  /* Custom Payment Overlay Modal */
+  .payment-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.9);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .modal-content {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 30px;
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .payment-details-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 16px;
+    border-radius: 12px;
+    margin: 16px 0;
+    font-size: 15px;
+  }
 </style>
 </head>
 <body>
@@ -275,13 +300,12 @@
 
   <div class="section-title">Core Collection</div>
   <div class="product-grid">
-    
     <div class="product-card">
       <img src="standard.png" alt="Aura Standard Card" class="card-preview-img">
       <div>
         <div class="product-title">Aura Standard</div>
-        <div class="product-price">400 EGP</div>
-        <button onclick="addToOrderCart('Aura Standard', 400)">Add To Order</button>
+        <div class="product-price">1,500 EGP</div>
+        <button onclick="addToOrderCart('Aura Standard', 1500)">Add To Order</button>
       </div>
     </div>
 
@@ -289,8 +313,8 @@
       <img src="prism.png" alt="Aura Prism Card" class="card-preview-img">
       <div>
         <div class="product-title">Aura Prism</div>
-        <div class="product-price">500 EGP</div>
-        <button onclick="addToOrderCart('Aura Prism', 500)">Add To Order</button>
+        <div class="product-price">2,200 EGP</div>
+        <button onclick="addToOrderCart('Aura Prism', 2200)">Add To Order</button>
       </div>
     </div>
 
@@ -298,8 +322,8 @@
       <img src="profilepro.png" alt="Aura Profile Pro Card" class="card-preview-img">
       <div>
         <div class="product-title">Profile Pro</div>
-        <div class="product-price">650 EGP</div>
-        <button onclick="addToOrderCart('Profile Pro', 650)">Add To Order</button>
+        <div class="product-price">2,900 EGP</div>
+        <button onclick="addToOrderCart('Profile Pro', 2900)">Add To Order</button>
       </div>
     </div>
 
@@ -307,11 +331,10 @@
       <img src="void.png" alt="Aura Void Card" class="card-preview-img">
       <div>
         <div class="product-title">Aura Void</div>
-        <div class="product-price">900 EGP</div>
-        <button onclick="addToOrderCart('Aura Void', 900)">Add To Order</button>
+        <div class="product-price">3,500 EGP</div>
+        <button onclick="addToOrderCart('Aura Void', 3500)">Add To Order</button>
       </div>
     </div>
-
   </div>
 
   <div class="section-title girly">✨ Exclusive Edition ✨</div>
@@ -321,8 +344,8 @@
         <img src="heraura.jpeg" alt="Her Aura Card" class="card-preview-img">
         <div>
           <div class="product-title" style="color: #f472b6;">Her Aura</div>
-          <div class="product-price exclusive-price">600 EGP</div>
-          <button class="girly-btn" onclick="addToOrderCart('Her Aura', 600)">Add To Order</button>
+          <div class="product-price exclusive-price">3,900 EGP</div>
+          <button class="girly-btn" onclick="addToOrderCart('Her Aura', 3900)">Add To Order</button>
         </div>
       </div>
     </div>
@@ -331,6 +354,12 @@
   <div class="checkout-section">
     <h2>Delivery Details & Checkout</h2>
     
+    <label for="payment-method">Select Payment Channel</label>
+    <select id="payment-method">
+      <option value="InstaPay">InstaPay App Transfer</option>
+      <option value="Cash Wallet">Mobile Cash Wallet</option>
+    </select>
+
     <label for="cust-shipping">Shipping Delivery Address (Egypt)</label>
     <textarea id="cust-shipping" rows="3" placeholder="Street Name, Building/Apartment No., City, Governorate"></textarea>
 
@@ -339,10 +368,26 @@
       <span id="cart-price-total" style="color: #34d399;">0 EGP</span>
     </div>
 
-    <button class="pay-btn" onclick="executeOrderCheckout()">Proceed to Secure Payment</button>
+    <button class="pay-btn" onclick="executeOrderCheckout()">Place Order & Get Transfer Info</button>
     <button onclick="window.location.href='index.html'" style="margin-top: 12px; background: transparent; border: none; color: #64748b; font-size: 13px;">← Return to Main Portal</button>
   </div>
+</div>
 
+<div class="payment-modal" id="p2p-modal">
+  <div class="modal-content">
+    <h3 style="margin-top:0; color:#fff;">Complete Your Payment</h3>
+    <p style="font-size:14px; color:#94a3b8;">Please manually transfer the exact amount to our local wallet address below:</p>
+    
+    <div class="payment-details-box">
+      <span id="modal-method-title" style="font-weight:700; color:#3b82f6;">Method</span><br>
+      <strong id="modal-transfer-details" style="font-size:18px; color:#fff; display:block; margin-top:8px;">YOUR_ADDRESS_HERE</strong>
+    </div>
+
+    <p style="font-size:13px; color:#e2e8f0; font-weight:600;">Total Amount: <span id="modal-amount-display" style="color:#34d399;">0 EGP</span></p>
+    <p style="font-size:12px; color:#64748b; margin-bottom:20px;">Once paid, our team will verify your transaction ledger record and fulfill the shipment within 48 hours.</p>
+
+    <button class="pay-btn" onclick="confirmPaymentAndClose()">I Have Transferred Successfully</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -355,38 +400,74 @@
   let dynamicCart = [];
   let orderTotalEGP = 0;
 
+  // Change these to your actual personal or business payment vectors
+  const P2P_DETAILS = {
+    "InstaPay": "qnbmarc@instapay",
+    "Mobile Wallet Cash": "01222878019 (Cash Wallet)"
+  };
+
   function addToOrderCart(styleName, costEGP) {
     dynamicCart.push({ cardStyle: styleName, price: costEGP });
     orderTotalEGP += costEGP;
-
-    // Instantly modify display metrics outputs
     document.getElementById('cart-item-count').innerText = dynamicCart.length;
     document.getElementById('cart-price-total').innerText = orderTotalEGP.toLocaleString() + " EGP";
   }
 
   async function executeOrderCheckout() {
     const addressInput = document.getElementById('cust-shipping').value;
+    const chosenMethod = document.getElementById('payment-method').value;
 
     if (dynamicCart.length === 0) {
-      alert("Your card selection array is empty! Add an item before checking out.");
+      alert("Your cart is empty!");
       return;
     }
 
     if (!addressInput.trim()) {
-      alert("Please specify a valid delivery shipping address coordinates parameters.");
+      alert("Please specify a valid delivery shipping address.");
       return;
     }
 
-    // Capture currently logged-in user instance context metrics from authentication layer
     const { data: { user } } = await localSupabase.auth.getUser();
-    
     if (!user) {
-      alert("No active session identifier found. Please log in first.");
+      alert("Please log in first before completing an order context.");
       window.location.href = 'index.html';
       return;
     }
 
-    alert("Connecting to Egyptian secure processing framework link...\nTotal Amount: " + orderTotalEGP + " EGP\nUser Identifier: " + user.email);
+    // Step 1: Write order entry data down directly to your Supabase public table matrix
+    const { error: dbError } = await localSupabase
+      .from('orders')
+      .insert([
+        {
+          user_id: user.id,
+          items: dynamicCart,
+          total_amount: orderTotalEGP,
+          shipping_address: addressInput,
+          payment_method: chosenMethod,
+          status: 'pending_verification'
+        }
+      ]);
+
+    if (dbError) {
+      alert("Could not process order queue into system database: " + dbError.message);
+      return;
+    }
+
+    document.getElementById('modal-method-title').innerText = chosenMethod;
+    document.getElementById('modal-transfer-details').innerText = P2P_DETAILS[chosenMethod];
+    document.getElementById('modal-amount-display').innerText = orderTotalEGP.toLocaleString() + " EGP";
+    document.getElementById('p2p-modal').style.display = 'flex';
+  }
+
+  function confirmPaymentAndClose() {
+    alert("Thank you! Your order context entry has been submitted for pending manager panel verification review confirmation.");
+    document.getElementById('p2p-modal').style.display = 'none';
+    // Clear shopping cart state parameters
+    dynamicCart = [];
+    orderTotalEGP = 0;
+    document.getElementById('cart-item-count').innerText = "0";
+    document.getElementById('cart-price-total').innerText = "0 EGP";
+    document.getElementById('cust-shipping').value = "";
   }
 </script>
 
