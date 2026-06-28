@@ -55,7 +55,6 @@
     width: 100%;
   }
 
-  /* Responsive Breakpoint: Switches to strict Side-by-Side configuration on wider viewports */
   @media(min-width: 700px) {
     .dashboard-grid {
       flex-direction: row;
@@ -78,7 +77,6 @@
     margin: 0 auto;
   }
 
-  /* Challenges Panel Fixed Directly Beside the Profile Card */
   .challenges-panel {
     width: 100%;
     max-width: 340px;
@@ -105,7 +103,6 @@
     gap: 8px;
   }
 
-  /* Bullet list formatting rules requested by user */
   .challenge-list {
     list-style: none;
     padding: 0;
@@ -188,7 +185,6 @@
     background: #10b981;
   }
 
-  /* Celebration Overlay Canvas */
   #celebration-canvas {
     position: fixed;
     top: 0;
@@ -390,7 +386,6 @@
     width: 100%;
   }
 
-  /* Identity Setup Modals */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -449,7 +444,6 @@
     border-color: #3b82f6;
   }
 
-  /* Advanced Searchable Multi-Select Elements */
   .search-dropdown-wrapper {
     position: relative;
     margin-bottom: 14px;
@@ -512,7 +506,6 @@
     color: #38bdf8;
   }
 
-  /* Modern Upload Button Component */
   .upload-trigger-btn {
     background: rgba(56, 189, 248, 0.1);
     border: 1px dashed rgba(56, 189, 248, 0.4);
@@ -541,6 +534,7 @@
 <div class="dashboard-grid">
   <div id="loading-msg">Connecting to network link...</div>
 
+  <!-- Left Side: Profile Card Pane -->
   <div class="profile-wrapper" id="profile-content" style="display: none;">
     <div class="avatar-container">
       <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator" alt="Profile Picture" class="profile-pic">
@@ -583,10 +577,12 @@
     </div>
   </div>
 
+  <!-- Right Side: Live Challenge Board Pane (Calculated from DB) -->
   <div class="challenges-panel" id="challenges-content" style="display: none;">
     <h3 class="panel-title">⚡ Matrix Objectives</h3>
     <ul class="challenge-list">
       
+      <!-- Challenge Item 1: Total Taps -->
       <li class="challenge-item" id="ch-icebreaker">
         <div class="challenge-meta">
           <span class="challenge-name">The Icebreaker</span>
@@ -597,6 +593,7 @@
         </div>
       </li>
 
+      <!-- Challenge Item 2: Unique Activity Days -->
       <li class="challenge-item" id="ch-regular">
         <div class="challenge-meta">
           <span class="challenge-name">The Regular</span>
@@ -662,13 +659,13 @@
   let selectedInterests = [];
   let tempBase64Avatar = "";
 
-  // Challenge Local processing configurations
+  // Challenge Local structural tracking rules
   let challengeState = {
     icebreaker: { current: 0, target: 3, completed: false, key: 'ch-icebreaker', txtId: 'icebreaker-txt', fillId: 'icebreaker-fill' },
     regular: { current: 0, target: 3, completed: false, key: 'ch-regular', txtId: 'regular-txt', fillId: 'regular-fill', suffix: ' Days' }
   };
 
-  // High Performance Canvas Configuration System
+  // High Performance Celebration Particle System
   const canvas = document.getElementById('celebration-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
@@ -681,7 +678,7 @@
   resizeCanvas();
 
   function triggerCelebrationBurst() {
-    const particleCount = 140;
+    const particleCount = 150;
     const colors = ['#3b82f6', '#10b981', '#38bdf8', '#34d399', '#fbbf24', '#f43f5e'];
     
     for (let i = 0; i < particleCount; i++) {
@@ -689,8 +686,8 @@
         x: window.innerWidth / 2,
         y: window.innerHeight / 2,
         vx: (Math.random() - 0.5) * 16,
-        vy: (Math.random() - 0.5) * 16 - 5,
-        radius: Math.random() * 4 + 2.5,
+        vy: (Math.random() - 0.5) * 16 - 6,
+        radius: Math.random() * 4 + 2,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1,
         decay: Math.random() * 0.012 + 0.008
@@ -726,11 +723,10 @@
   }
   requestAnimationFrame(renderCelebration);
 
-  function trackChallengeProgress(key, increment) {
+  // Directly sets challenge progress values and triggers particles ONLY when newly completed
+  function setChallengeProgress(key, currentVal) {
     let ch = challengeState[key];
-    if (ch.completed) return;
-
-    ch.current = Math.min(ch.current + increment, ch.target);
+    ch.current = Math.min(currentVal, ch.target);
     
     const fillEl = document.getElementById(ch.fillId);
     const txtEl = document.getElementById(ch.txtId);
@@ -744,6 +740,42 @@
       ch.completed = true;
       itemEl.classList.add('completed');
       triggerCelebrationBurst();
+    }
+  }
+
+  // Live calculation function pulling directly from verified db transactions
+  async function calculateRealChallenges(userId) {
+    try {
+      const { data: scans, error } = await localSupabase
+        .from('nfc_scans')
+        .select('claimed_at')
+        .eq('claimed_by', userId)
+        .eq('claimed', true);
+
+      if (error) throw error;
+
+      if (!scans || scans.length === 0) {
+        setChallengeProgress('icebreaker', 0);
+        setChallengeProgress('regular', 0);
+        return;
+      }
+
+      // 1. Icebreaker = Count of real verified scans total
+      const totalScansCount = scans.length;
+      setChallengeProgress('icebreaker', totalScansCount);
+
+      // 2. Regular = Unique Calendar Days
+      const uniqueDays = new Set();
+      scans.forEach(scan => {
+        if (scan.claimed_at) {
+          const dateStr = scan.claimed_at.split('T')[0]; // Extract YYYY-MM-DD
+          uniqueDays.add(dateStr);
+        }
+      });
+      setChallengeProgress('regular', uniqueDays.size);
+
+    } catch (err) {
+      console.error("Error evaluating live matrix objectives:", err);
     }
   }
 
@@ -892,9 +924,8 @@
         renderInterests(selectedInterests);
         updateUI();
 
-        // Baseline initialization values for demonstration
-        trackChallengeProgress('icebreaker', 1); 
-        trackChallengeProgress('regular', 2);
+        // RUN real database verification calculations rather than fake numbers
+        await calculateRealChallenges(currentUserId);
 
         const urlParams = new URLSearchParams(window.location.search);
         const scanId = urlParams.get('scan_id');
@@ -922,6 +953,7 @@
         document.getElementById('name').innerText = user.email.split('@')[0];
         document.getElementById('user-avatar').src = FALLBACK_AVATAR;
         updateUI();
+        await calculateRealChallenges(currentUserId);
       }
     } catch (err) {
       console.error(err);
@@ -955,9 +987,8 @@
     }
     updateUI();
     
-    // Increments objectives instantly upon verification trigger
-    trackChallengeProgress('icebreaker', 1);
-    trackChallengeProgress('regular', 1);
+    // Automatically recalculate metrics immediately after a live transaction finishes
+    await calculateRealChallenges(currentUserId);
 
     await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 5 });
 
