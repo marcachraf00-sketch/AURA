@@ -45,7 +45,6 @@
     z-index: -1;
   }
 
-  /* Side-by-Side Flex Grid Dashboard Setup */
   .dashboard-grid {
     display: flex;
     flex-direction: column;
@@ -592,7 +591,7 @@
   </div>
 
   <div class="challenges-panel" id="challenges-content" style="display: none;">
-    <h3 class="panel-title">⚡ Matrix Objectives</h3>
+    <h3 class="panel-title">⚡ Weekly Challenges</h3>
     <ul class="challenge-list">
       
       <li class="challenge-item" id="ch-icebreaker">
@@ -676,13 +675,11 @@
   let selectedInterests = [];
   let tempBase64Avatar = "";
 
-  // Challenge Local Configuration Model
   let challengeState = {
     icebreaker: { current: 0, target: 3, completed: false, key: 'ch-icebreaker', txtId: 'icebreaker-txt', fillId: 'icebreaker-fill' },
     regular: { current: 0, target: 3, completed: false, key: 'ch-regular', txtId: 'regular-txt', fillId: 'regular-fill', suffix: ' Days' }
   };
 
-  // Canvas Particle Animation Engine
   const canvas = document.getElementById('celebration-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
