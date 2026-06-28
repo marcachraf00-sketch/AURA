@@ -1084,7 +1084,8 @@
     renderInterests(selectedInterests);
     document.getElementById('edit-modal').style.display = 'none';
 
-    await localSupabase.from('profiles').update({
+    await localSupabase.from('profiles').upsert({
+      id: currentUserId,
       username: nameVal,
       age: ageVal,
       avatar_url: tempBase64Avatar,
