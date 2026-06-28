@@ -893,7 +893,7 @@
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
         tempBase64Avatar = canvas.toDataURL('image/jpeg', 0.7);
-        document.getElementById('upload-avatar-click').innerText = "✅ Image Compressed Perfectly";
+        document.getElementById('upload-avatar-click').innerText = "✅ Image Added Perfectly";
       };
       img.src = event.target.result;
     };
@@ -921,7 +921,6 @@
     }
   });
 
-  /* LOAD PROFILE ENGINE (100% GENERIC PIPELINE) */
   async function loadProfile(){
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -929,10 +928,8 @@
       const ownerIdFromUrl = urlParams.get('owner_id'); 
       const sub = document.getElementById('status-sub');
 
-      // Identify viewing user session context
       const { data:{user} } = await localSupabase.auth.getUser();
       
-      // Determine target layout entity row
       const activeProfileUUID = ownerIdFromUrl || (user ? user.id : null);
 
       if (!activeProfileUUID) {
@@ -941,7 +938,6 @@
         return;
       }
 
-      // Process NFC verification parameters
       if (scanId) {
         const { data: scanData, error: scanError } = await localSupabase
           .from('nfc_scans')
