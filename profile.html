@@ -17,7 +17,7 @@
     margin: 0;
     letter-spacing: -0.01em;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
     user-select: none;
   }
 
@@ -44,7 +44,7 @@
   }
 
   .profile-wrapper {
-    width: 340px;                      
+    width: 340px;                    
     text-align: center;
     padding: 30px 24px;
     box-sizing: border-box;
@@ -53,13 +53,42 @@
     border-radius: 24px;
   }
 
+  /* Avatar Style Rules */
+  .avatar-container {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 16px auto;
+  }
+
+  .profile-pic {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(56, 189, 248, 0.4);
+    background: #1e293b;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+  }
+
   h1 {
     font-size: 32px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin: 0 0 6px 0;
+    margin: 0 0 4px 0;
     color: #ffffff;
     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  .age-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.07);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+    font-weight: 500;
   }
 
   .subtitle {
@@ -68,7 +97,7 @@
     color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    margin: 0 0 40px 0;
+    margin: 0 0 28px 0;
     transition: color 0.3s;
   }
 
@@ -82,14 +111,52 @@
     to { text-shadow: 0 0 12px rgba(0, 255, 136, 0.6); }
   }
 
+  .interests-section {
+    text-align: left;
+    margin-bottom: 28px;
+  }
+
+  .interests-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .interests-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 24px;
+  }
+
+  .interest-tag {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #38bdf8;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .no-interests {
+    font-size: 13px;
+    color: #475569;
+    font-style: italic;
+  }
+
   .stats-container {
     width: 100%;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     text-align: left;
   }
 
   .stat-item {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .stat-info {
@@ -136,6 +203,11 @@
     box-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
   }
 
+  .btn-group {
+    display: flex;
+    gap: 10px;
+  }
+
   button {
     width: 100%;
     padding: 14px;
@@ -155,11 +227,78 @@
     background: rgba(255, 255, 255, 0.1);
   }
 
+  .primary-btn {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #38bdf8;
+  }
+
+  .primary-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+  }
+
   #loading-msg {
     font-size: 14px;
     color: #94a3b8;
     text-align: center;
     font-weight: 500;
+  }
+
+  /* Identity Setup Modals */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(15, 23, 42, 0.85);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+  }
+
+  .modal-box {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 360px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .modal-box h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: #fff;
+    text-align: left;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0f172a;
+    color: #fff;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #3b82f6;
   }
 </style>
 </head>
@@ -173,8 +312,20 @@
   <div id="loading-msg">Connecting to network link...</div>
 
   <div id="profile-content" style="display: none; width: 100%;">
+    
+    <div class="avatar-container">
+      <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator" alt="Profile Picture" class="profile-pic">
+    </div>
+
     <h1 id="name">Loading...</h1>
+    <div id="age-display" class="age-badge" style="display: none;">Age: --</div>
     <p class="subtitle" id="status-sub">Verified Aura Operator</p>
+
+    <div class="interests-section">
+      <span class="interests-label">Interests Matrix</span>
+      <div id="interests-container" class="interests-box">
+        </div>
+    </div>
 
     <div class="stats-container">
       <div class="stat-item">
@@ -190,7 +341,7 @@
       <div class="stat-item">
         <div class="stat-info">
           <span class="stat-label">XP</span>
-          <span class="stat-value" id="xp-val">0</span>
+          <span class="stat-value" id="xp-val">0 / 200 XP</span>
         </div>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" id="xp-fill"></div>
@@ -198,7 +349,33 @@
       </div>
     </div>
 
-    <button id="logout-btn">Sign Out</button>
+    <div class="btn-group">
+      <button class="primary-btn" id="edit-profile-btn">Edit Profile</button>
+      <button id="logout-btn">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <h3>Update Operator Identity</h3>
+    
+    <label for="edit-username">Display Name</label>
+    <input type="text" id="edit-username" placeholder="Change username">
+
+    <label for="edit-age">Age</label>
+    <input type="number" id="edit-age" placeholder="Enter age" min="1" max="120">
+
+    <label for="edit-avatar">Profile Picture Image URL</label>
+    <input type="text" id="edit-avatar" placeholder="Leave empty for fallback avatar">
+
+    <label for="edit-interests">Interests (Comma Separated)</label>
+    <input type="text" id="edit-interests" placeholder="Networking, Tech, Marketing">
+
+    <div class="btn-group" style="margin-top: 10px;">
+      <button class="primary-btn" id="save-profile-btn">Save Identity</button>
+      <button id="close-modal-btn" style="background:transparent; border-color:transparent; color:#64748b;">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -216,61 +393,120 @@
   let currentUserId = null;
   let currentXP = 0;
   let currentLevel = 1;
+  const XP_PER_LEVEL = 200; // Base metrics updated to 200 XP
+  const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
 
   function updateUI() {
     document.getElementById('level-val').innerText = currentLevel;
-    document.getElementById('xp-val').innerText = currentXP + " XP";
+    document.getElementById('xp-val').innerText = currentXP + " / " + XP_PER_LEVEL + " XP";
 
     const levelPercent = Math.min((currentLevel / 100) * 100, 100);
-    const xpPercent = Math.min((currentXP / 1000) * 100, 100);
+    const xpPercent = Math.min((currentXP / XP_PER_LEVEL) * 100, 100);
 
     document.getElementById('level-fill').style.width = levelPercent + "%";
     document.getElementById('xp-fill').style.width = xpPercent + "%";
   }
 
-  async function loadProfile(){
-    const { data:{user}, error: authError } = await localSupabase.auth.getUser();
-
-    if(authError || !user){
-      window.location.href = 'index.html';
+  function renderInterests(interestsArray) {
+    const container = document.getElementById('interests-container');
+    container.innerHTML = '';
+    
+    if (!interestsArray || interestsArray.length === 0 || (interestsArray.length === 1 && interestsArray[0].trim() === "")) {
+      container.innerHTML = '<span class="no-interests">No matrix parameters added</span>';
       return;
     }
 
-    currentUserId = user.id;
+    interestsArray.forEach(interest => {
+      if (interest.trim() !== "") {
+        const tag = document.createElement('span');
+        tag.className = 'interest-tag';
+        tag.innerText = interest.trim();
+        container.appendChild(tag);
+      }
+    });
+  }
 
-    const { data, error: dbError } = await localSupabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+  async function loadProfile(){
+    try {
+      const { data:{user}, error: authError } = await localSupabase.auth.getUser();
 
-    if(data){
-      currentLevel = data.level || 1;
-      currentXP = data.xp || 0;
-      
-      if (data.username) {
-        document.getElementById('name').innerText = data.username;
+      if(authError || !user){
+        window.location.href = 'index.html';
+        return;
+      }
+
+      currentUserId = user.id;
+
+      const { data, error: dbError } = await localSupabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if(data){
+        currentLevel = data.level || 1;
+        currentXP = data.xp || 0;
+        
+        if (data.username) {
+          document.getElementById('name').innerText = data.username;
+          document.getElementById('edit-username').value = data.username;
+        } else {
+          document.getElementById('name').innerText = user.email.split('@')[0];
+          document.getElementById('edit-username').value = user.email.split('@')[0];
+        }
+
+        if (data.age) {
+          const ageEl = document.getElementById('age-display');
+          ageEl.innerText = "Age: " + data.age;
+          ageEl.style.display = 'inline-block';
+          document.getElementById('edit-age').value = data.age;
+        } else {
+          document.getElementById('age-display').style.display = 'none';
+        }
+
+        if (data.avatar_url && data.avatar_url.trim() !== "") {
+          document.getElementById('user-avatar').src = data.avatar_url;
+          document.getElementById('edit-avatar').value = data.avatar_url;
+        } else {
+          document.getElementById('user-avatar').src = FALLBACK_AVATAR;
+          document.getElementById('edit-avatar').value = "";
+        }
+
+        // Custom interests array layout split
+        let interestsArr = [];
+        if (Array.isArray(data.interests)) {
+          interestsArr = data.interests;
+        } else if (typeof data.interests === 'string' && data.interests.trim() !== "") {
+          interestsArr = data.interests.split(',');
+        }
+        renderInterests(interestsArr);
+        document.getElementById('edit-interests').value = interestsArr.join(', ');
+        
+        updateUI();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('source') === 'nfc') {
+          handleNFCTap();
+        }
       } else {
         document.getElementById('name').innerText = user.email.split('@')[0];
+        document.getElementById('user-avatar').src = FALLBACK_AVATAR;
+        updateUI();
       }
-      
-      updateUI();
 
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('source') === 'nfc') {
-        handleNFCTap();
-      }
+    } catch (err) {
+      console.error("Initialization pipeline exception caught:", err);
     }
 
+    // Always clear the blocking loading splash unless a hard crash blocks it
     document.getElementById('loading-msg').style.display = 'none';
     document.getElementById('profile-content').style.display = 'block';
   }
 
   async function handleNFCTap() {
-    // 1. Optimistic screen visual change
     currentXP += 5;
-    if (currentXP >= 1000) {
-      currentXP -= 1000;
+    if (currentXP >= XP_PER_LEVEL) {
+      currentXP -= XP_PER_LEVEL;
       currentLevel += 1;
     }
     updateUI();
@@ -288,6 +524,51 @@
       console.error("NFC transaction failed sync:", error.message);
     }
   }
+
+  document.getElementById('edit-profile-btn').addEventListener('click', () => {
+    document.getElementById('edit-modal').style.display = 'flex';
+  });
+
+  document.getElementById('close-modal-btn').addEventListener('click', () => {
+    document.getElementById('edit-modal').style.display = 'none';
+  });
+
+  document.getElementById('save-profile-btn').addEventListener('click', async () => {
+    const updatedName = document.getElementById('edit-username').value.trim();
+    const updatedAge = parseInt(document.getElementById('edit-age').value) || null;
+    const updatedAvatar = document.getElementById('edit-avatar').value.trim();
+    const rawInterests = document.getElementById('edit-interests').value;
+    
+    const updatedInterestsArr = rawInterests.split(',').map(i => i.trim()).filter(i => i !== "");
+
+    document.getElementById('name').innerText = updatedName;
+    if (updatedAge) {
+      const ageDisplay = document.getElementById('age-display');
+      ageDisplay.innerText = "Age: " + updatedAge;
+      ageDisplay.style.display = 'inline-block';
+    } else {
+      document.getElementById('age-display').style.display = 'none';
+    }
+    
+    document.getElementById('user-avatar').src = updatedAvatar !== "" ? updatedAvatar : FALLBACK_AVATAR;
+    renderInterests(updatedInterestsArr);
+
+    document.getElementById('edit-modal').style.display = 'none';
+
+    const { error } = await localSupabase
+      .from('profiles')
+      .update({
+        username: updatedName,
+        age: updatedAge,
+        avatar_url: updatedAvatar,
+        interests: updatedInterestsArr
+      })
+      .eq('id', currentUserId);
+
+    if (error) {
+      alert("Error syncing data profile parameters: " + error.message);
+    }
+  });
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
     await localSupabase.auth.signOut();
