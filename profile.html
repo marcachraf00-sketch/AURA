@@ -663,7 +663,7 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  let currentUserId = "21f3064f-60af-4909-b751-2446033af104"; // Default fallback tracking ID
+  let currentUserId = "21f3064f-60af-4909-b751-2446033af104"; // Target Tracking UUID
   let currentXP = 0;
   let currentLevel = 1;
   const XP_PER_LEVEL = 200; 
@@ -919,11 +919,9 @@
     }
   });
 
-  /* LOAD PROFILE MAIN ENGINE */
   async function loadProfile(){
     try {
       const { data:{user} } = await localSupabase.auth.getUser();
-      
       if (user) {
         currentUserId = user.id;
       }
@@ -947,7 +945,6 @@
   }
 
   function renderLoadedProfile(data) {
-    // Check if level or XP actually changed to trigger particle burst effects
     if ((data.xp && data.xp > currentXP) || (data.level && data.level > currentLevel)) {
       triggerCelebrationBurst();
     }
@@ -1015,10 +1012,12 @@
     window.location.href = 'index.html';
   });
 
-  // Execute base profile load pipeline layout
+  // Execute initial layout pipeline load
   loadProfile();
 
-  // ⚡ OPEN REALTIME LISTENING CHANNEL FOR LIVE GRAPHICS RE-RENDERING ⚡
+  // ⚡ DUAL-CHANNEL REALTIME REAL-TIME LISTENER ENGINE ⚡
+  
+  // CHANNEL 1: Listen for live level/XP shifts on your profile row
   localSupabase
     .channel('live-profile-changes')
     .on(
@@ -1027,12 +1026,29 @@
         event: 'UPDATE',
         schema: 'public',
         table: 'profiles',
-        filter: `id=eq.21f3064f-60af-4909-b751-2446033af104` // Strict tracker filtering on your specific user profile UUID row
+        filter: `id=eq.21f3064f-60af-4909-b751-2446033af104` 
       },
       (payload) => {
-        console.log('⚡ Realtime Matrix Synchronization Update Received:', payload.new);
-        // Feed the live changes directly into the renderer pipeline instantly!
+        console.log('⚡ Realtime Profile Update:', payload.new);
         renderLoadedProfile(payload.new);
+      }
+    )
+    .subscribe();
+
+  // CHANNEL 2: Listen for live raw card inserts to tally matrix challenge cards instantly
+  localSupabase
+    .channel('live-scan-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'nfc_scans',
+        filter: `claimed_by=eq.21f3064f-60af-4909-b751-2446033af104` 
+      },
+      (payload) => {
+        console.log('⚡ Realtime Card Tap Logged! Recalculating Matrix Objectives...');
+        calculateRealChallenges('21f3064f-60af-4909-b751-2446033af104');
       }
     )
     .subscribe();
