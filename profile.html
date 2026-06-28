@@ -548,6 +548,7 @@
 <div class="dashboard-grid">
   <div id="loading-msg">Connecting to network link...</div>
 
+  <!-- Left Side: Profile Card Pane -->
   <div class="profile-wrapper" id="profile-content" style="display: none;">
     <div class="avatar-container">
       <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator" alt="Profile Picture" class="profile-pic">
@@ -590,6 +591,7 @@
     </div>
   </div>
 
+  <!-- Right Side: Live Challenge Board Pane (Calculated from DB) -->
   <div class="challenges-panel" id="challenges-content" style="display: none;">
     <h3 class="panel-title">⚡ Matrix Objectives</h3>
     <ul class="challenge-list">
@@ -657,9 +659,6 @@
 <script>
 (function() {
   if (!window.supabase) return;
-
-  // 🔴 VITAL CONFIGURATION: Replace this text block with your absolute real Supabase user profile UUID
-  const TARGET_PROFILE_UUID = 'YOUR_ACTUAL_SUPABASE_USER_UUID_HERE';
 
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
@@ -768,6 +767,7 @@
   }
 
   async function calculateRealChallenges(userId) {
+    if (!userId) return;
     try {
       const weeklyResetTimestamp = getLastFridayMidnight();
       const { data: scans, error } = await localSupabase
@@ -921,14 +921,27 @@
     }
   });
 
-  /* LOAD PROFILE ENGINE (UNLOCKED PIPELINE FOR GUESTS) */
+  /* LOAD PROFILE ENGINE (100% GENERIC PIPELINE) */
   async function loadProfile(){
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const scanId = urlParams.get('scan_id');
+      const ownerIdFromUrl = urlParams.get('owner_id'); 
       const sub = document.getElementById('status-sub');
 
-      // 1. Process NFC Tap Intercept Immediately
+      // Identify viewing user session context
+      const { data:{user} } = await localSupabase.auth.getUser();
+      
+      // Determine target layout entity row
+      const activeProfileUUID = ownerIdFromUrl || (user ? user.id : null);
+
+      if (!activeProfileUUID) {
+        document.getElementById('loading-msg').innerText = "❌ Profile target missing. Redirecting...";
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+        return;
+      }
+
+      // Process NFC verification parameters
       if (scanId) {
         const { data: scanData, error: scanError } = await localSupabase
           .from('nfc_scans')
@@ -943,37 +956,24 @@
           sub.innerText = "🔒 Already claimed this week!";
           sub.style.color = "#f59e0b";
         } else {
-          // Process Transaction mapping anonymously or with logged-in data safely
           await localSupabase
             .from('nfc_scans')
             .update({
               claimed: true,
-              claimed_by: TARGET_PROFILE_UUID,
+              claimed_by: activeProfileUUID,
               claimed_at: new Date().toISOString()
             })
             .eq('id', scanId);
 
-          // Add 20 XP directly via Remote Procedure Call function on the cloud
-          await localSupabase.rpc('increment_xp', { user_id: TARGET_PROFILE_UUID, xp_to_add: 20 });
+          await localSupabase.rpc('increment_xp', { user_id: activeProfileUUID, xp_to_add: 20 });
           sub.innerText = "⚡ Secure NFC Tap Verified: +20 XP Added!";
           sub.classList.add('nfc-active');
           triggerCelebrationBurst();
         }
       }
 
-      // 2. Identify System Visitor Authorization Level
-      const { data:{user} } = await localSupabase.auth.getUser();
-      
-      if (!user) {
-        // Guest view mode: explicitly pull your profile information records
-        const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', TARGET_PROFILE_UUID).maybeSingle();
-        if (profData) renderLoadedProfile(profData);
-        
-        // Hide workspace modifications panels from unauthenticated outsiders
-        document.getElementById('edit-profile-btn').style.display = 'none';
-        document.getElementById('logout-btn').style.display = 'none';
-      } else {
-        // Logged-in view mode
+      // Check access configurations to toggle customization dashboard features
+      if (user && user.id === activeProfileUUID) {
         currentUserId = user.id;
         const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
         if (profData) {
@@ -981,7 +981,20 @@
           document.getElementById('edit-username').value = profData.username || "";
           document.getElementById('edit-age').value = profData.age || "";
         }
+      } else {
+        const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', activeProfileUUID).maybeSingle();
+        if (profData) {
+          renderLoadedProfile(profData);
+        } else {
+          document.getElementById('loading-msg').innerText = "❌ Identity signature data file not found.";
+          return;
+        }
+        
+        // Disable UI customization access buttons for third-party guest monitors
+        document.getElementById('edit-profile-btn').style.display = 'none';
+        document.getElementById('logout-btn').style.display = 'none';
       }
+
     } catch (err) {
       console.error(err);
     }
