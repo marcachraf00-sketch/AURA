@@ -592,7 +592,7 @@
   </div>
 
   <div class="challenges-panel" id="challenges-content" style="display: none;">
-    <h3 class="panel-title">⚡ Weekly Challenges</h3>
+    <h3 class="panel-title">⚡ Matrix Objectives</h3>
     <ul class="challenge-list">
       
       <li class="challenge-item" id="ch-icebreaker">
@@ -945,11 +945,14 @@
           document.getElementById('edit-age').value = data.age;
         }
 
+        // FIX: Ensure tempBase64Avatar gets filled with the database data so it doesn't get cleared out on sub-sequent edits
         if (data.avatar_url && data.avatar_url.trim() !== "") {
           document.getElementById('user-avatar').src = data.avatar_url;
           tempBase64Avatar = data.avatar_url;
+          document.getElementById('upload-avatar-click').innerText = "✅ Custom Photo Active";
         } else {
           document.getElementById('user-avatar').src = FALLBACK_AVATAR;
+          tempBase64Avatar = "";
         }
 
         if (Array.isArray(data.interests)) {
@@ -987,6 +990,7 @@
       } else {
         document.getElementById('name').innerText = user.email.split('@')[0];
         document.getElementById('user-avatar').src = FALLBACK_AVATAR;
+        tempBase64Avatar = "";
         updateUI();
         await calculateRealChallenges(currentUserId);
       }
@@ -1015,7 +1019,6 @@
       return;
     }
 
-    // Increased tap count value addition to 20 XP
     currentXP += 20;
     if (currentXP >= XP_PER_LEVEL) { 
       currentXP -= XP_PER_LEVEL; 
@@ -1024,8 +1027,6 @@
     updateUI();
     
     await calculateRealChallenges(currentUserId);
-
-    // Sync 20 XP payout payload with back-end storage procedure function
     await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 20 });
 
     sub.innerText = "⚡ Secure NFC Tap Verified: +20 XP Added!";
