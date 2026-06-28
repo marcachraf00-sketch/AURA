@@ -3,45 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A U R A - Sign Up</title>
-
+<title>AURA - Create Profile Portal</title>
 <style>
   body {
-    background: #0f172a;
-    color: white;
+    background: #0f172a; 
+    color: #f8fafc;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
-  .signup-container {
-    width: 320px;
+  .auth-container {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 400px;
+    width: 100%;
     text-align: center;
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
   }
 
   h1 {
-    font-size: 32px;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #ffffff;
   }
 
   .subtitle {
     color: #94a3b8;
     font-size: 14px;
-    margin: 0 0 30px 0;
+    margin: 0 0 24px 0;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    text-align: left;
   }
 
   input {
     width: 100%;
     padding: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.02);
+    background: #1e293b;
     color: white;
     box-sizing: border-box;
     font-size: 14px;
@@ -49,25 +64,51 @@
 
   input:focus {
     outline: none;
-    border-color: #34d399;
-    background: rgba(255, 255, 255, 0.04);
+    border-color: #3b82f6;
   }
 
-  button.submit-btn {
+  /* Highlight wrapper for the gatekeeper input */
+  .code-group {
+    margin-bottom: 20px;
+    background: rgba(244, 114, 182, 0.02);
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px dashed rgba(244, 114, 182, 0.2);
+  }
+
+  .code-input {
+    border-color: rgba(244, 114, 182, 0.3);
+    margin-bottom: 6px;
+  }
+  
+  .code-input:focus {
+    border-color: #f472b6;
+  }
+
+  .code-help-text {
+    font-size: 11px;
+    color: #f472b6;
+    text-align: left;
+    margin: 0;
+    padding-left: 2px;
+    display: block;
+  }
+
+  .submit-btn {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
     border: none;
-    background: #34d399;
-    color: #0f172a;
-    font-weight: bold;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
+    background: #3b82f6;
+    color: white;
     transition: background 0.2s ease;
   }
 
-  button.submit-btn:hover {
-    background: #10b981;
+  .submit-btn:hover {
+    background: #2563eb;
   }
 
   .footer-links {
@@ -79,86 +120,84 @@
   .footer-links a {
     color: #3b82f6;
     text-decoration: none;
-    font-weight: 600;
-  }
-
-  .footer-links a:hover {
-    text-decoration: underline;
   }
 </style>
 </head>
 <body>
 
-<div class="signup-container">
-  <h1>Join AURA</h1>
-  <p class="subtitle">Create your unique network account profile</p>
-  
-  <input type="text" id="signup-username" placeholder="Username">
-  <input type="email" id="signup-email" placeholder="Email Address">
-  <input type="tel" id="signup-phone" placeholder="Phone Number (e.g. +2010...)">
-  <input type="password" id="signup-password" placeholder="Choose Password">
-  
-  <button class="submit-btn" id="signup-action">Register Account</button>
+<div class="auth-container">
+  <h1>Create Portal Account</h1>
+  <p class="subtitle">Set up your private digital profile dashboard parameters</p>
+
+  <form id="signup-form" onsubmit="handleUserSignup(event)">
+    
+    <div class="code-group">
+      <label for="invite-code" style="color: #f472b6; font-weight: 600;">Activation Invite Code</label>
+      <input type="text" id="invite-code" class="code-input" placeholder="e.g., AURA-XXXX-XXXX" required>
+      <small class="code-help-text">🔑 Received manually upon delivery verification payment check.</small>
+    </div>
+
+    <label for="user-email">Email Address</label>
+    <input type="email" id="user-email" placeholder="name@example.com" required>
+
+    <label for="user-password">Password (Min. 6 characters)</label>
+    <input type="password" id="user-password" placeholder="••••••••" required>
+
+    <button type="submit" class="submit-btn">Register Profile Portal</button>
+  </form>
 
   <div class="footer-links">
-    Already have an account? <a href="index.html">Sign In</a>
+    Already registered? <a href="login.html">Log In</a><br><br>
+    <a href="index.html" style="color: #64748b;">← Return to Main Page</a>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Link connection to your live active Supabase project
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  document.getElementById('signup-action').addEventListener('click', async () => {
-    const usernameInput = document.getElementById('signup-username').value;
-    const email = document.getElementById('signup-email').value;
-    const phone = document.getElementById('signup-phone').value;
-    const password = document.getElementById('signup-password').value;
+  async function handleUserSignup(event) {
+    event.preventDefault();
+    
+    const inviteCode = document.getElementById('invite-code').value.trim();
+    const emailStr = document.getElementById('user-email').value;
+    const passwordStr = document.getElementById('user-password').value;
 
-    if (!usernameInput || !email || !phone || !password) {
-      alert("Please fill out all registration fields before processing operations.");
+    const { data: codeData, error: codeError } = await localSupabase
+      .from('invite_codes')
+      .select('*')
+      .eq('code', inviteCode)
+      .eq('is_used', false)
+      .single();
+
+    if (codeError || !codeData) {
+      alert("Verification Failed: Invalid or already used Activation Invite Code. Account creation denied.");
       return;
     }
 
     const { data: authData, error: authError } = await localSupabase.auth.signUp({
-      email: email,
-      password: password
+      email: emailStr,
+      password: passwordStr,
     });
 
     if (authError) {
-      alert("Authentication identity generation failed: " + authError.message);
+      alert("Registration Error: " + authError.message);
       return;
     }
 
-    const generatedUserId = authData.user?.id;
+    if (authData.user) {
+      await localSupabase
+        .from('invite_codes')
+        .update({ is_used: true })
+        .eq('code', inviteCode);
 
-    if (generatedUserId) {
-      // Step 2: Push row parameters to your custom public data table
-      // Note: Remember to swap 'profiles' out for your actual table name if it's called something else!
-      const { error: tableWriteError } = await localSupabase
-        .from('profiles') 
-        .insert([
-          { 
-            id: generatedUserId,          // Binds data structure to user ID
-            username: usernameInput,      // Maps data securely to your exact 'username' column schema
-            phone: phone,                 // Maps data to your phone column
-            email: email
-          }
-        ]);
-
-      if (tableWriteError) {
-        alert("Auth account built, but data table injection failed: " + tableWriteError.message);
-        return;
-      }
+      alert("Account created successfully! Welcome to your AURA profile portal.");
+      window.location.href = 'dashboard.html'; 
     }
-
-    alert("Account successfully created and synchronized!");
-    window.location.href = 'profile.html';
-  });
+  }
 </script>
 
 </body>
