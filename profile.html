@@ -332,7 +332,6 @@
 
   #level-val { color: #38bdf8; }
   #xp-val { color: #34d399; }
-  #taps-val { color: #fbbf24; } /* Custom highlight color for Taps counter */
 
   .progress-bar-bg {
     width: 100%;
@@ -559,21 +558,11 @@
     <p class="subtitle" id="status-sub">Verified Aura Operator</p>
 
     <div class="interests-section">
-      <span class="interests-label">Interests</span>
+      <span class="interests-label">Interests Matrix</span>
       <div id="interests-container" class="interests-box"></div>
     </div>
 
     <div class="stats-container">
-      <div class="stat-item">
-        <div class="stat-info">
-          <span class="stat-label">Aura Taps</span>
-          <span class="stat-value" id="taps-val">0</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" id="taps-fill" style="background: linear-gradient(90deg, #d97706, #fbbf24); width: 100%; box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);"></div>
-        </div>
-      </div>
-
       <div class="stat-item">
         <div class="stat-info">
           <span class="stat-label">Level</span>
@@ -604,7 +593,6 @@
   <div class="challenges-panel" id="challenges-content" style="display: none;">
     <h3 class="panel-title">⚡ Matrix Objectives</h3>
     <ul class="challenge-list">
-      
       <li class="challenge-item" id="ch-icebreaker">
         <div class="challenge-meta">
           <div>
@@ -630,7 +618,6 @@
           <div class="challenge-bar-fill" id="regular-fill"></div>
         </div>
       </li>
-
     </ul>
   </div>
 </div>
@@ -671,6 +658,9 @@
 (function() {
   if (!window.supabase) return;
 
+  // 🔴 VITAL CONFIGURATION: Replace this text block with your absolute real Supabase user profile UUID
+  const TARGET_PROFILE_UUID = 'YOUR_ACTUAL_SUPABASE_USER_UUID_HERE';
+
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
@@ -679,7 +669,6 @@
   let currentUserId = null;
   let currentXP = 0;
   let currentLevel = 1;
-  let totalTaps = 0; // Local data variable tracking total taps
   const XP_PER_LEVEL = 200; 
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
   
@@ -687,13 +676,11 @@
   let selectedInterests = [];
   let tempBase64Avatar = "";
 
-  // Challenge Local Configuration Model
   let challengeState = {
     icebreaker: { current: 0, target: 3, completed: false, key: 'ch-icebreaker', txtId: 'icebreaker-txt', fillId: 'icebreaker-fill' },
     regular: { current: 0, target: 3, completed: false, key: 'ch-regular', txtId: 'regular-txt', fillId: 'regular-fill', suffix: ' Days' }
   };
 
-  // Canvas Particle Animation Engine
   const canvas = document.getElementById('celebration-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
@@ -708,7 +695,6 @@
   function triggerCelebrationBurst() {
     const particleCount = 150;
     const colors = ['#3b82f6', '#10b981', '#38bdf8', '#34d399', '#fbbf24', '#f43f5e'];
-    
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: window.innerWidth / 2,
@@ -731,12 +717,10 @@
       p.y += p.vy;
       p.vy += 0.22; 
       p.alpha -= p.decay;
-
       if (p.alpha <= 0) {
         particles.splice(i, 1);
         continue;
       }
-
       ctx.save();
       ctx.globalAlpha = p.alpha;
       ctx.beginPath();
@@ -776,20 +760,16 @@
   function getLastFridayMidnight() {
     const now = new Date();
     const lastFriday = new Date(now);
-    
     const currentDay = now.getDay();
     const daysSinceFriday = (currentDay + 2) % 7; 
-    
     lastFriday.setDate(now.getDate() - daysSinceFriday);
     lastFriday.setHours(0, 0, 0, 0);
-    
     return lastFriday.toISOString();
   }
 
   async function calculateRealChallenges(userId) {
     try {
       const weeklyResetTimestamp = getLastFridayMidnight();
-
       const { data: scans, error } = await localSupabase
         .from('nfc_scans')
         .select('claimed_at')
@@ -798,7 +778,6 @@
         .gte('claimed_at', weeklyResetTimestamp);
 
       if (error) throw error;
-
       if (!scans || scans.length === 0) {
         setChallengeProgress('icebreaker', 0);
         setChallengeProgress('regular', 0);
@@ -815,14 +794,12 @@
         }
       });
       setChallengeProgress('regular', uniqueDays.size);
-
     } catch (err) {
       console.error("Error evaluating live matrix objectives:", err);
     }
   }
 
   function updateUI() {
-    document.getElementById('taps-val').innerText = totalTaps; // Sync visual taps layout
     document.getElementById('level-val').innerText = currentLevel;
     document.getElementById('xp-val').innerText = currentXP + " / " + XP_PER_LEVEL + " XP";
     document.getElementById('level-fill').style.width = Math.min((currentLevel / 100) * 100, 100) + "%";
@@ -893,39 +870,28 @@
     document.getElementById('device-file-input').click();
   });
 
-  /* CANVAS COMPRESSION FILTER */
   document.getElementById('device-file-input').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    
     const reader = new FileReader();
     reader.onload = function(event) {
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
         const MAX_WIDTH = 200;
         const MAX_HEIGHT = 200;
         let width = img.width;
         let height = img.height;
 
         if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
         } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
         }
-        
         canvas.width = width;
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
-        
         tempBase64Avatar = canvas.toDataURL('image/jpeg', 0.7);
         document.getElementById('upload-avatar-click').innerText = "✅ Image Compressed Perfectly";
       };
@@ -955,81 +921,66 @@
     }
   });
 
+  /* LOAD PROFILE ENGINE (UNLOCKED PIPELINE FOR GUESTS) */
   async function loadProfile(){
     try {
-      const { data:{user}, error: authError } = await localSupabase.auth.getUser();
-      if(authError || !user){
-        window.location.href = 'index.html';
-        return;
-      }
-      currentUserId = user.id;
+      const urlParams = new URLSearchParams(window.location.search);
+      const scanId = urlParams.get('scan_id');
+      const sub = document.getElementById('status-sub');
 
-      const { data, error: dbError } = await localSupabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
+      // 1. Process NFC Tap Intercept Immediately
+      if (scanId) {
+        const { data: scanData, error: scanError } = await localSupabase
+          .from('nfc_scans')
+          .select('*')
+          .eq('id', scanId)
+          .maybeSingle();
 
-      if(data){
-        currentLevel = data.level || 1;
-        currentXP = data.xp || 0;
-        totalTaps = data.tap_count || 0; // Retrieve tap count integer values from database
-        document.getElementById('name').innerText = data.username || user.email.split('@')[0];
-        document.getElementById('edit-username').value = data.username || user.email.split('@')[0];
-
-        if (data.age) {
-          document.getElementById('age-display').innerText = "Age: " + data.age;
-          document.getElementById('age-display').style.display = 'inline-block';
-          document.getElementById('edit-age').value = data.age;
-        }
-
-        if (data.avatar_url && data.avatar_url.trim() !== "") {
-          document.getElementById('user-avatar').src = data.avatar_url;
-          tempBase64Avatar = data.avatar_url;
-          document.getElementById('upload-avatar-click').innerText = "✅ Custom Photo Active";
+        if (scanError || !scanData) {
+          sub.innerText = "❌ Invalid NFC Security Code";
+          sub.style.color = "#ef4444";
+        } else if (scanData.claimed) {
+          sub.innerText = "🔒 Already claimed this week!";
+          sub.style.color = "#f59e0b";
         } else {
-          document.getElementById('user-avatar').src = FALLBACK_AVATAR;
-          tempBase64Avatar = "";
-        }
-
-        if (Array.isArray(data.interests)) {
-          selectedInterests = data.interests;
-        } else if (typeof data.interests === 'string' && data.interests.trim() !== "") {
-          selectedInterests = data.interests.split(',');
-        }
-        renderInterests(selectedInterests);
-        updateUI();
-
-        await calculateRealChallenges(currentUserId);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const scanId = urlParams.get('scan_id');
-
-        if (scanId) {
-          const { data: scanData, error: scanError } = await localSupabase
+          // Process Transaction mapping anonymously or with logged-in data safely
+          await localSupabase
             .from('nfc_scans')
-            .select('*')
-            .eq('id', scanId)
-            .maybeSingle();
+            .update({
+              claimed: true,
+              claimed_by: TARGET_PROFILE_UUID,
+              claimed_at: new Date().toISOString()
+            })
+            .eq('id', scanId);
 
-          if (scanError || !scanData) {
-            const sub = document.getElementById('status-sub');
-            sub.innerText = "❌ Invalid NFC Security Code";
-            sub.style.color = "#ef4444";
-          } else if (scanData.claimed) {
-            const sub = document.getElementById('status-sub');
-            sub.innerText = "🔒 This NFC link has already been claimed!";
-            sub.style.color = "#f59e0b";
-          } else {
-            await handleSecureNFCTap(scanId);
-          }
+          // Add 20 XP directly via Remote Procedure Call function on the cloud
+          await localSupabase.rpc('increment_xp', { user_id: TARGET_PROFILE_UUID, xp_to_add: 20 });
+          sub.innerText = "⚡ Secure NFC Tap Verified: +20 XP Added!";
+          sub.classList.add('nfc-active');
+          triggerCelebrationBurst();
         }
+      }
+
+      // 2. Identify System Visitor Authorization Level
+      const { data:{user} } = await localSupabase.auth.getUser();
+      
+      if (!user) {
+        // Guest view mode: explicitly pull your profile information records
+        const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', TARGET_PROFILE_UUID).maybeSingle();
+        if (profData) renderLoadedProfile(profData);
+        
+        // Hide workspace modifications panels from unauthenticated outsiders
+        document.getElementById('edit-profile-btn').style.display = 'none';
+        document.getElementById('logout-btn').style.display = 'none';
       } else {
-        document.getElementById('name').innerText = user.email.split('@')[0];
-        document.getElementById('user-avatar').src = FALLBACK_AVATAR;
-        tempBase64Avatar = "";
-        updateUI();
-        await calculateRealChallenges(currentUserId);
+        // Logged-in view mode
+        currentUserId = user.id;
+        const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
+        if (profData) {
+          renderLoadedProfile(profData);
+          document.getElementById('edit-username').value = profData.username || "";
+          document.getElementById('edit-age').value = profData.age || "";
+        }
       }
     } catch (err) {
       console.error(err);
@@ -1039,40 +990,33 @@
     document.getElementById('challenges-content').style.display = 'block';
   }
 
-  async function handleSecureNFCTap(scanId) {
-    const sub = document.getElementById('status-sub');
+  function renderLoadedProfile(data) {
+    currentLevel = data.level || 1;
+    currentXP = data.xp || 0;
+    document.getElementById('name').innerText = data.username || "Operator Matrix";
     
-    const { error: updateError } = await localSupabase
-      .from('nfc_scans')
-      .update({
-        claimed: true,
-        claimed_by: currentUserId,
-        claimed_at: new Date().toISOString()
-      })
-      .eq('id', scanId);
-
-    if (updateError) {
-      sub.innerText = "⚠️ Security error processing tap.";
-      return;
+    if (data.age) {
+      document.getElementById('age-display').innerText = "Age: " + data.age;
+      document.getElementById('age-display').style.display = 'inline-block';
+    } else {
+      document.getElementById('age-display').style.display = 'none';
     }
 
-    // ATOMIC HIT DETECTED: Increment total card tap metrics both on server and locally
-    totalTaps += 1;
-    localSupabase.rpc('increment_tap_count', { profile_uuid: currentUserId })
-      .then(({ error }) => { if (error) console.error("Tap RPC tracking failure:", error); });
-
-    currentXP += 20;
-    if (currentXP >= XP_PER_LEVEL) { 
-      currentXP -= XP_PER_LEVEL; 
-      currentLevel += 1; 
+    if (data.avatar_url && data.avatar_url.trim() !== "") {
+      document.getElementById('user-avatar').src = data.avatar_url;
+      tempBase64Avatar = data.avatar_url;
+    } else {
+      document.getElementById('user-avatar').src = FALLBACK_AVATAR;
     }
+
+    if (Array.isArray(data.interests)) {
+      selectedInterests = data.interests;
+    } else if (typeof data.interests === 'string' && data.interests.trim() !== "") {
+      selectedInterests = data.interests.split(',');
+    }
+    renderInterests(selectedInterests);
     updateUI();
-    
-    await calculateRealChallenges(currentUserId);
-    await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 20 });
-
-    sub.innerText = "⚡ Secure NFC Tap Verified: +20 XP Added!";
-    sub.classList.add('nfc-active');
+    calculateRealChallenges(data.id);
   }
 
   document.getElementById('edit-profile-btn').addEventListener('click', () => {
@@ -1084,38 +1028,23 @@
     document.getElementById('edit-modal').style.display = 'none';
   });
 
-  /* FIXED DATA PERSISTENCE CONTEXT (UPSERT ENGINE + CONSOLE DEBUGGING) */
   document.getElementById('save-profile-btn').addEventListener('click', async () => {
     const nameVal = document.getElementById('edit-username').value.trim();
     const ageVal = parseInt(document.getElementById('edit-age').value) || null;
 
-    document.getElementById('name').innerText = nameVal;
-    if (ageVal) {
-      document.getElementById('age-display').innerText = "Age: " + ageVal;
-      document.getElementById('age-display').style.display = 'inline-block';
-    } else {
-      document.getElementById('age-display').style.display = 'none';
-    }
-    
-    document.getElementById('user-avatar').src = tempBase64Avatar !== "" ? tempBase64Avatar : FALLBACK_AVATAR;
-    renderInterests(selectedInterests);
-    document.getElementById('edit-modal').style.display = 'none';
-
-    // Added tap_count to upsert fields so data parameters don't reset to 0 upon identity saves
     const { error } = await localSupabase.from('profiles').upsert({
       id: currentUserId, 
       username: nameVal,
       age: ageVal,
       avatar_url: tempBase64Avatar,
-      interests: selectedInterests,
-      tap_count: totalTaps 
+      interests: selectedInterests
     });
 
     if (error) {
       console.error("❌ SUPABASE WRITE DIRECT REJECTION ERROR:", error.message, error.details);
-      alert("Profile Sync Failed: " + error.message + "\nCheck browser Console tab for database logs.");
+      alert("Profile Sync Failed: " + error.message);
     } else {
-      console.log("✅ Profile row synced successfully to database cloud mesh.");
+      window.location.href = 'index.html';
     }
   });
 
