@@ -485,7 +485,6 @@
   const XP_PER_LEVEL = 200; 
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
   
-  // Matrix Global Preset Configurations
   const PRESET_INTERESTS = ["Tech", "Networking", "Marketing", "Design", "Development", "NFC", "AI", "Startup", "HR", "Sourcing", "Media Buying", "Apparel"];
   let selectedInterests = [];
   let tempBase64Avatar = "";
@@ -514,7 +513,6 @@
     });
   }
 
-  // Live Dropdown Builder Core Logic
   function updateModalChipsAndDropdown() {
     const chipsContainer = document.getElementById('chips-container');
     chipsContainer.innerHTML = '';
@@ -558,7 +556,6 @@
     }
   }
 
-  // Base64 File Extraction Processing Pipeline
   document.getElementById('upload-avatar-click').addEventListener('click', () => {
     document.getElementById('device-file-input').click();
   });
@@ -574,7 +571,6 @@
     reader.readAsDataURL(file);
   });
 
-  // Modal Close Intercepts
   document.getElementById('chips-container').addEventListener('click', (e) => {
     if (e.target.tagName === 'SPAN') {
       const valToRemove = e.target.getAttribute('data-value');
@@ -596,6 +592,7 @@
     }
   });
 
+  // Combined Verification Pipeline
   async function loadProfile(){
     try {
       const { data:{user}, error: authError } = await localSupabase.auth.getUser();
@@ -638,8 +635,29 @@
         renderInterests(selectedInterests);
         updateUI();
 
-        if (new URLSearchParams(window.location.search).get('source') === 'nfc') {
-          handleNFCTap();
+        // Step 3 Integration: Secure URL Query Parameter Scan Extraction
+        const urlParams = new URLSearchParams(window.location.search);
+        const scanId = urlParams.get('scan_id');
+
+        if (scanId) {
+          const { data: scanData, error: scanError } = await localSupabase
+            .from('nfc_scans')
+            .select('*')
+            .eq('id', scanId)
+            .maybeSingle();
+
+          if (scanError || !scanData) {
+            const sub = document.getElementById('status-sub');
+            sub.innerText = "❌ Invalid NFC Security Code";
+            sub.style.color = "#ef4444";
+          } else if (scanData.claimed) {
+            const sub = document.getElementById('status-sub');
+            sub.innerText = "🔒 This NFC link has already been claimed!";
+            sub.style.color = "#f59e0b";
+          } else {
+            // Step 4 Integration: Execute the secure, non-repeatable transactional update
+            await handleSecureNFCTap(scanId);
+          }
         }
       } else {
         document.getElementById('name').innerText = user.email.split('@')[0];
@@ -653,14 +671,35 @@
     document.getElementById('profile-content').style.display = 'block';
   }
 
-  async function handleNFCTap() {
-    currentXP += 5;
-    if (currentXP >= XP_PER_LEVEL) { currentXP -= XP_PER_LEVEL; currentLevel += 1; }
-    updateUI();
+  // Step 4 Integration: Structural Database-first Validation Architecture
+  async function handleSecureNFCTap(scanId) {
     const sub = document.getElementById('status-sub');
-    sub.innerText = "⚡ NFC Tap Detected: +5 XP Added!";
-    sub.classList.add('nfc-active');
+    
+    const { error: updateError } = await localSupabase
+      .from('nfc_scans')
+      .update({
+        claimed: true,
+        claimed_by: currentUserId,
+        claimed_at: new Date().toISOString()
+      })
+      .eq('id', scanId);
+
+    if (updateError) {
+      sub.innerText = "⚠️ Security error processing tap.";
+      return;
+    }
+
+    currentXP += 5;
+    if (currentXP >= XP_PER_LEVEL) { 
+      currentXP -= XP_PER_LEVEL; 
+      currentLevel += 1; 
+    }
+    updateUI();
+    
     await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 5 });
+
+    sub.innerText = "⚡ Secure NFC Tap Verified: +5 XP Added!";
+    sub.classList.add('nfc-active');
   }
 
   document.getElementById('edit-profile-btn').addEventListener('click', () => {
@@ -704,6 +743,5 @@
   loadProfile();
 })();
 </script>
-
 </body>
 </html>
