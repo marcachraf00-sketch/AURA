@@ -592,7 +592,7 @@
   </div>
 
   <div class="challenges-panel" id="challenges-content" style="display: none;">
-    <h3 class="panel-title">⚡ Matrix Objectives</h3>
+    <h3 class="panel-title">⚡ Weekly Challenges</h3>
     <ul class="challenge-list">
       
       <li class="challenge-item" id="ch-icebreaker">
@@ -757,17 +757,37 @@
       ch.completed = true;
       itemEl.classList.add('completed');
       triggerCelebrationBurst();
+    } else if (ch.current < ch.target && ch.completed) {
+      ch.completed = false;
+      itemEl.classList.remove('completed');
     }
   }
 
-  // Live Metric Aggregator Framework
+  // Returns ISO string of the most recent Friday at 12:00:00 AM
+  function getLastFridayMidnight() {
+    const now = new Date();
+    const lastFriday = new Date(now);
+    
+    const currentDay = now.getDay();
+    const daysSinceFriday = (currentDay + 2) % 7; 
+    
+    lastFriday.setDate(now.getDate() - daysSinceFriday);
+    lastFriday.setHours(0, 0, 0, 0);
+    
+    return lastFriday.toISOString();
+  }
+
+  // Live Metric Aggregator Framework with Rolling Weekly Filter
   async function calculateRealChallenges(userId) {
     try {
+      const weeklyResetTimestamp = getLastFridayMidnight();
+
       const { data: scans, error } = await localSupabase
         .from('nfc_scans')
         .select('claimed_at')
         .eq('claimed_by', userId)
-        .eq('claimed', true);
+        .eq('claimed', true)
+        .gte('claimed_at', weeklyResetTimestamp);
 
       if (error) throw error;
 
@@ -940,7 +960,6 @@
         renderInterests(selectedInterests);
         updateUI();
 
-        // Load real live metrics from db
         await calculateRealChallenges(currentUserId);
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -996,19 +1015,20 @@
       return;
     }
 
-    currentXP += 5;
+    // Increased tap count value addition to 20 XP
+    currentXP += 20;
     if (currentXP >= XP_PER_LEVEL) { 
       currentXP -= XP_PER_LEVEL; 
       currentLevel += 1; 
     }
     updateUI();
     
-    // Automatically recalculate metrics immediately after a transaction updates
     await calculateRealChallenges(currentUserId);
 
-    await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 5 });
+    // Sync 20 XP payout payload with back-end storage procedure function
+    await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 20 });
 
-    sub.innerText = "⚡ Secure NFC Tap Verified: +5 XP Added!";
+    sub.innerText = "⚡ Secure NFC Tap Verified: +20 XP Added!";
     sub.classList.add('nfc-active');
   }
 
