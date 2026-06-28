@@ -89,6 +89,7 @@
     box-shadow: 0 0 25px rgba(244, 114, 182, 0.25);
     max-width: 260px;
     width: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
   @keyframes gradientFlow {
@@ -304,7 +305,7 @@
       <div>
         <div class="product-title">Aura Standard</div>
         <div class="product-price">400 EGP</div>
-        <button onclick="addToOrderCart('Aura Standard', 400)">Add To Order</button>
+        <button onclick="window.addToOrderCart('Aura Standard', 400)">Add To Order</button>
       </div>
     </div>
 
@@ -313,7 +314,7 @@
       <div>
         <div class="product-title">Aura Prism</div>
         <div class="product-price">500 EGP</div>
-        <button onclick="addToOrderCart('Aura Prism', 500)">Add To Order</button>
+        <button onclick="window.addToOrderCart('Aura Prism', 500)">Add To Order</button>
       </div>
     </div>
 
@@ -322,7 +323,7 @@
       <div>
         <div class="product-title">Profile Pro</div>
         <div class="product-price">600 EGP</div>
-        <button onclick="addToOrderCart('Profile Pro', 600)">Add To Order</button>
+        <button onclick="window.addToOrderCart('Profile Pro', 600)">Add To Order</button>
       </div>
     </div>
 
@@ -331,12 +332,12 @@
       <div>
         <div class="product-title">Aura Void</div>
         <div class="product-price">800 EGP</div>
-        <button onclick="addToOrderCart('Aura Void', 800)">Add To Order</button>
+        <button onclick="window.addToOrderCart('Aura Void', 800)">Add To Order</button>
       </div>
     </div>
   </div>
 
-  <div class="section-title girly">-- Exclusive Edition --</div>
+  <div class="section-title girly">✨ Exclusive Edition ✨</div>
   <div class="exclusive-center-container">
     <div class="exclusive-glow-wrapper">
       <div class="product-card girly-exclusive">
@@ -344,7 +345,7 @@
         <div>
           <div class="product-title" style="color: #f472b6;">Her Aura</div>
           <div class="product-price exclusive-price">999 EGP</div>
-          <button class="girly-btn" onclick="addToOrderCart('Her Aura', 999)">Add To Order</button>
+          <button class="girly-btn" onclick="window.addToOrderCart('Her Aura', 999)">Add To Order</button>
         </div>
       </div>
     </div>
@@ -356,8 +357,8 @@
     <label for="cust-name">Full Name</label>
     <input type="text" id="cust-name" placeholder="Enter your full name">
 
-    <label for="cust-contact">Phone Number</label>
-    <input type="text" id="cust-contact" placeholder="01xxxxxxxxx">
+    <label for="cust-contact">Phone Number / Email Address</label>
+    <input type="text" id="cust-contact" placeholder="01xxxxxxxxx or email@example.com">
 
     <label for="payment-method">Select Payment Channel</label>
     <select id="payment-method">
@@ -374,7 +375,7 @@
       <span id="cart-price-total" style="color: #34d399;">0 EGP</span>
     </div>
 
-    <button class="pay-btn" onclick="executeOrderCheckout()">Place Order & Get Transfer Info</button>
+    <button class="pay-btn" onclick="window.executeOrderCheckout()">Place Order & Get Transfer Info</button>
   </div>
 </div>
 
@@ -391,37 +392,113 @@
     <p style="font-size:13px; color:#e2e8f0; font-weight:600;">Total Amount: <span id="modal-amount-display" style="color:#34d399;">0 EGP</span></p>
     <p style="font-size:12px; color:#64748b; margin-bottom:20px;">Once paid, our team will verify your transaction ledger record and fulfill the shipment within 48 hours.</p>
 
-    <button class="pay-btn" onclick="confirmPaymentAndClose()">I Have Transferred Successfully</button>
+    <button class="pay-btn" onclick="window.confirmPaymentAndClose()">I Have Transferred Successfully</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Initialize Supabase Client securely
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  let dynamicCart = [];
-  let orderTotalEGP = 0;
+  window.dynamicCart = [];
+  window.orderTotalEGP = 0;
 
   const P2P_DETAILS = {
     "InstaPay": "aura@instapay",
     "Vodafone Cash": "01012345678 (Vodafone Cash Wallet)"
   };
 
-  function addToOrderCart(styleName, costEGP) {
-    dynamicCart.push({ cardStyle: styleName, price: costEGP });
-    orderTotalEGP += costEGP;
-    document.getElementById('cart-item-count').innerText = dynamicCart.length;
-    document.getElementById('cart-price-total').innerText = orderTotalEGP.toLocaleString() + " EGP";
-  }
+  window.addToOrderCart = function(styleName, costEGP) {
+    try {
+      window.dynamicCart.push({ cardStyle: styleName, price: costEGP });
+      window.orderTotalEGP += costEGP;
+      
+      const countEl = document.getElementById('cart-item-count');
+      const totalEl = document.getElementById('cart-price-total');
+      
+      if (countEl) countEl.innerText = window.dynamicCart.length;
+      if (totalEl) totalEl.innerText = window.orderTotalEGP.toLocaleString() + " EGP";
+      
+      console.log(`Added ${styleName}. Total: ${window.orderTotalEGP} EGP`);
+    } catch (err) {
+      console.error("Error in addToOrderCart:", err);
+    }
+  };
 
-  function resetFormAndCart() {
-    dynamicCart = [];
-    orderTotalEGP = 0;
-    document.getElementById('cart-item-count').innerText = "0";
-    document.getElementById('cart-price-total').innerText = "0 EGP";
-    document.getElementById('cust-name').value = "";
-    document.getElementById('cust-contact').value = "";
-    document.getElementById('cust-shipping
+  window.resetFormAndCart = function() {
+    window.dynamicCart = [];
+    window.orderTotalEGP = 0;
+    
+    if (document.getElementById('cart-item-count')) document.getElementById('cart-item-count').innerText = "0";
+    if (document.getElementById('cart-price-total')) document.getElementById('cart-price-total').innerText = "0 EGP";
+    if (document.getElementById('cust-name')) document.getElementById('cust-name').value = "";
+    if (document.getElementById('cust-contact')) document.getElementById('cust-contact').value = "";
+    if (document.getElementById('cust-shipping')) document.getElementById('cust-shipping').value = "";
+  };
+
+  window.executeOrderCheckout = async function() {
+    const nameInput = document.getElementById('cust-name')?.value || "";
+    const contactInput = document.getElementById('cust-contact')?.value || "";
+    const addressInput = document.getElementById('cust-shipping')?.value || "";
+    const chosenMethod = document.getElementById('payment-method')?.value || "InstaPay";
+
+    if (window.dynamicCart.length === 0) {
+      alert("Your cart is empty! Please choose a card style first.");
+      return;
+    }
+
+    if (!nameInput.trim() || !contactInput.trim() || !addressInput.trim()) {
+      alert("Please fill out your Name, Contact details, and Shipping Address.");
+      return;
+    }
+
+    const dbStatus = chosenMethod === 'Cash on Delivery' ? 'pending_delivery' : 'pending_verification';
+
+    try {
+      // Save order record to live Supabase backend instance matrix
+      const { error: dbError } = await localSupabase
+        .from('orders')
+        .insert([
+          {
+            customer_name: nameInput,
+            customer_contact: contactInput,
+            items: window.dynamicCart,
+            total_amount: window.orderTotalEGP,
+            shipping_address: addressInput,
+            payment_method: chosenMethod,
+            status: dbStatus
+          }
+        ]);
+
+      if (dbError) {
+        alert("Could not process order entry: " + dbError.message);
+        return;
+      }
+
+      if (chosenMethod === 'Cash on Delivery') {
+        alert("Thank you! Your Cash on Delivery order has been submitted successfully. Our team will process your fulfillment and prepare the package within 48 hours.");
+        window.resetFormAndCart();
+      } else {
+        document.getElementById('modal-method-title').innerText = chosenMethod;
+        document.getElementById('modal-transfer-details').innerText = P2P_DETAILS[chosenMethod] || "";
+        document.getElementById('modal-amount-display').innerText = window.orderTotalEGP.toLocaleString() + " EGP";
+        document.getElementById('p2p-modal').style.display = 'flex';
+      }
+    } catch (err) {
+      alert("An unexpected runtime failure happened: " + err.message);
+    }
+  };
+
+  window.confirmPaymentAndClose = function() {
+    alert("Thank you! Your guest order has been submitted. Our team will manually match your payment transfer against the ledger to fulfill your delivery.");
+    if (document.getElementById('p2p-modal')) document.getElementById('p2p-modal').style.display = 'none';
+    window.resetFormAndCart();
+  };
+</script>
+
+</body>
+</html>
