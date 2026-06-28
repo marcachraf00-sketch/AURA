@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile</title>
+<title>My Profile & Objectives</title>
 
 <style>
   body {
@@ -548,7 +548,6 @@
 <div class="dashboard-grid">
   <div id="loading-msg">Connecting to network link...</div>
 
-  <!-- Left Side: Profile Card Pane -->
   <div class="profile-wrapper" id="profile-content" style="display: none;">
     <div class="avatar-container">
       <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator" alt="Profile Picture" class="profile-pic">
@@ -591,7 +590,6 @@
     </div>
   </div>
 
-  <!-- Right Side: Live Challenge Board Pane (Calculated from DB) -->
   <div class="challenges-panel" id="challenges-content" style="display: none;">
     <h3 class="panel-title">⚡ Matrix Objectives</h3>
     <ul class="challenge-list">
@@ -665,7 +663,7 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  let currentUserId = null;
+  let currentUserId = "21f3064f-60af-4909-b751-2446033af104"; // Default fallback tracking ID
   let currentXP = 0;
   let currentLevel = 1;
   const XP_PER_LEVEL = 200; 
@@ -893,7 +891,7 @@
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
         tempBase64Avatar = canvas.toDataURL('image/jpeg', 0.7);
-        document.getElementById('upload-avatar-click').innerText = "✅ Image Added Perfectly";
+        document.getElementById('upload-avatar-click').innerText = "✅ Image Compressed Perfectly";
       };
       img.src = event.target.result;
     };
@@ -921,75 +919,23 @@
     }
   });
 
+  /* LOAD PROFILE MAIN ENGINE */
   async function loadProfile(){
     try {
-      alert("URL Check -> Scan: " + scanId + " | Owner: " + ownerIdFromUrl);
-      const urlParams = new URLSearchParams(window.location.search);
-      const scanId = urlParams.get('scan_id');
-      const ownerIdFromUrl = urlParams.get('owner_id'); 
-      const sub = document.getElementById('status-sub');
-
       const { data:{user} } = await localSupabase.auth.getUser();
       
-      const activeProfileUUID = ownerIdFromUrl || (user ? user.id : null);
-
-      if (!activeProfileUUID) {
-        document.getElementById('loading-msg').innerText = "❌ Profile target missing. Redirecting...";
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
-        return;
-      }
-
-      if (scanId) {
-        const { data: scanData, error: scanError } = await localSupabase
-          .from('nfc_scans')
-          .select('*')
-          .eq('id', scanId)
-          .maybeSingle();
-
-        if (scanError || !scanData) {
-          sub.innerText = "❌ Invalid NFC Security Code";
-          sub.style.color = "#ef4444";
-        } else if (scanData.claimed) {
-          sub.innerText = "🔒 Already claimed this week!";
-          sub.style.color = "#f59e0b";
-        } else {
-          await localSupabase
-            .from('nfc_scans')
-            .update({
-              claimed: true,
-              claimed_by: activeProfileUUID,
-              claimed_at: new Date().toISOString()
-            })
-            .eq('id', scanId);
-
-          await localSupabase.rpc('increment_xp', { user_id: activeProfileUUID, xp_to_add: 20 });
-          sub.innerText = "⚡ Secure NFC Tap Verified: +20 XP Added!";
-          sub.classList.add('nfc-active');
-          triggerCelebrationBurst();
-        }
-      }
-
-      // Check access configurations to toggle customization dashboard features
-      if (user && user.id === activeProfileUUID) {
+      if (user) {
         currentUserId = user.id;
-        const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
-        if (profData) {
-          renderLoadedProfile(profData);
-          document.getElementById('edit-username').value = profData.username || "";
-          document.getElementById('edit-age').value = profData.age || "";
-        }
+      }
+
+      const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
+      if (profData) {
+        renderLoadedProfile(profData);
+        document.getElementById('edit-username').value = profData.username || "";
+        document.getElementById('edit-age').value = profData.age || "";
       } else {
-        const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', activeProfileUUID).maybeSingle();
-        if (profData) {
-          renderLoadedProfile(profData);
-        } else {
-          document.getElementById('loading-msg').innerText = "❌ Identity signature data file not found.";
-          return;
-        }
-        
-        // Disable UI customization access buttons for third-party guest monitors
-        document.getElementById('edit-profile-btn').style.display = 'none';
-        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('loading-msg').innerText = "❌ No active session matrix row found.";
+        return;
       }
 
     } catch (err) {
@@ -1001,6 +947,11 @@
   }
 
   function renderLoadedProfile(data) {
+    // Check if level or XP actually changed to trigger particle burst effects
+    if ((data.xp && data.xp > currentXP) || (data.level && data.level > currentLevel)) {
+      triggerCelebrationBurst();
+    }
+
     currentLevel = data.level || 1;
     currentXP = data.xp || 0;
     document.getElementById('name').innerText = data.username || "Operator Matrix";
@@ -1051,10 +1002,11 @@
     });
 
     if (error) {
-      console.error("❌ SUPABASE WRITE DIRECT REJECTION ERROR:", error.message, error.details);
+      console.error("❌ SUPABASE WRITE DIRECT REJECTION ERROR:", error.message);
       alert("Profile Sync Failed: " + error.message);
     } else {
-      window.location.href = 'index.html';
+      document.getElementById('edit-modal').style.display = 'none';
+      loadProfile();
     }
   });
 
@@ -1063,7 +1015,28 @@
     window.location.href = 'index.html';
   });
 
+  // Execute base profile load pipeline layout
   loadProfile();
+
+  // ⚡ OPEN REALTIME LISTENING CHANNEL FOR LIVE GRAPHICS RE-RENDERING ⚡
+  localSupabase
+    .channel('live-profile-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.21f3064f-60af-4909-b751-2446033af104` // Strict tracker filtering on your specific user profile UUID row
+      },
+      (payload) => {
+        console.log('⚡ Realtime Matrix Synchronization Update Received:', payload.new);
+        // Feed the live changes directly into the renderer pipeline instantly!
+        renderLoadedProfile(payload.new);
+      }
+    )
+    .subscribe();
+
 })();
 </script>
 </body>
