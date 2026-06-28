@@ -45,12 +45,37 @@
     margin: 0;
   }
 
+  /* Section Headings */
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin: 32px 0 16px 0;
+    border-left: 3px solid #3b82f6;
+    padding-left: 10px;
+  }
+
+  .section-title.girly {
+    color: #f472b6;
+    border-left-color: #f472b6;
+  }
+
   /* Product Selection Grid */
   .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 32px;
+  }
+
+  /* Exclusive Single Card Placement Container */
+  .exclusive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+    gap: 20px;
+    margin-bottom: 40px;
   }
 
   .product-card {
@@ -71,7 +96,13 @@
     box-shadow: 0 12px 24px -10px rgba(59, 130, 246, 0.15);
   }
 
-  /* Enhanced Card Image Display styling */
+  /* Girly Exclusive Card Hover Variant */
+  .product-card.girly-exclusive:hover {
+    border-color: rgba(244, 114, 182, 0.4);
+    box-shadow: 0 12px 24px -10px rgba(244, 114, 182, 0.2);
+  }
+
+  /* Card Image Display Styling */
   .card-preview-img {
     width: 100%;
     height: 130px;
@@ -98,6 +129,10 @@
     color: #34d399;
     font-weight: 700;
     margin-bottom: 16px;
+  }
+
+  .exclusive-price {
+    color: #f472b6 !important;
   }
 
   /* Input Forms Elements */
@@ -142,7 +177,7 @@
     background: rgba(255, 255, 255, 0.04);
   }
 
-  /* Utility Interactive Buttons */
+  /* Buttons */
   button {
     width: 100%;
     padding: 12px;
@@ -158,6 +193,17 @@
 
   button:hover {
     background: rgba(255, 255, 255, 0.12);
+  }
+
+  .girly-btn {
+    background: rgba(244, 114, 182, 0.1);
+    border-color: rgba(244, 114, 182, 0.2);
+    color: #f472b6;
+  }
+
+  .girly-btn:hover {
+    background: rgba(244, 114, 182, 0.2);
+    border-color: rgba(244, 114, 182, 0.4);
   }
 
   button.pay-btn {
@@ -192,6 +238,7 @@
     <p class="subtitle">Deploy your physical NFC identity vector link</p>
   </header>
 
+  <div class="section-title">Core Collection</div>
   <div class="product-grid">
     
     <!-- Card 1: Standard -->
@@ -234,6 +281,19 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- New Girly Exclusive Selection Segment -->
+  <div class="section-title girly">Exclusive</div>
+  <div class="exclusive-grid">
+    <div class="product-card girly-exclusive">
+      <img src="heraura.jpeg" alt="Her Aura Card" class="card-preview-img">
+      <div>
+        <div class="product-title" style="color: #f472b6;">Her Aura</div>
+        <div class="product-price exclusive-price">3,900 EGP</div>
+        <button class="girly-btn" onclick="addToOrderCart('Her Aura', 3900)">Add To Order</button>
+      </div>
+    </div>
   </div>
 
   <div class="checkout-section">
