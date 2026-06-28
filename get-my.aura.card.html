@@ -166,6 +166,7 @@
     color: #f472b6 !important;
   }
 
+  /* Input Forms Elements */
   .checkout-section {
     background: rgba(255, 255, 255, 0.01);
     border: 1px solid rgba(255, 255, 255, 0.04);
@@ -188,7 +189,7 @@
     text-align: left;
   }
 
-  select, textarea {
+  input, select, textarea {
     width: 100%;
     padding: 14px;
     margin-bottom: 16px;
@@ -201,7 +202,7 @@
     font-family: inherit;
   }
 
-  textarea:focus, select:focus {
+  input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: #3b82f6;
   }
@@ -343,8 +344,8 @@
         <img src="heraura.jpeg" alt="Her Aura Card" class="card-preview-img">
         <div>
           <div class="product-title" style="color: #f472b6;">Her Aura</div>
-          <div class="product-price exclusive-price">999 EGP</div>
-          <button class="girly-btn" onclick="addToOrderCart('Her Aura', 999)">Add To Order</button>
+          <div class="product-price exclusive-price">3,900 EGP</div>
+          <button class="girly-btn" onclick="addToOrderCart('Her Aura', 3900)">Add To Order</button>
         </div>
       </div>
     </div>
@@ -353,10 +354,16 @@
   <div class="checkout-section">
     <h2>Delivery Details & Checkout</h2>
     
+    <label for="cust-name">Full Name</label>
+    <input type="text" id="cust-name" placeholder="Enter your full name">
+
+    <label for="cust-contact">Phone Number / Email Address</label>
+    <input type="text" id="cust-contact" placeholder="01xxxxxxxxx or email@example.com">
+
     <label for="payment-method">Select Payment Channel</label>
     <select id="payment-method">
       <option value="InstaPay">InstaPay App Transfer</option>
-      <option value="Cash Wallet">Mobile Cash Wallet</option>
+      <option value="Vodafone Cash">Vodafone Cash Wallet</option>
     </select>
 
     <label for="cust-shipping">Shipping Delivery Address (Egypt)</label>
@@ -368,10 +375,10 @@
     </div>
 
     <button class="pay-btn" onclick="executeOrderCheckout()">Place Order & Get Transfer Info</button>
-    <button onclick="window.location.href='index.html'" style="margin-top: 12px; background: transparent; border: none; color: #64748b; font-size: 13px;">← Return to Main Portal</button>
   </div>
 </div>
 
+<!-- Manual P2P Payment Instructions Display Overlay Modal -->
 <div class="payment-modal" id="p2p-modal">
   <div class="modal-content">
     <h3 style="margin-top:0; color:#fff;">Complete Your Payment</h3>
@@ -399,10 +406,9 @@
   let dynamicCart = [];
   let orderTotalEGP = 0;
 
-  // Change these to your actual personal or business payment vectors
   const P2P_DETAILS = {
-    "InstaPay": "qnbmarc@instapay",
-    "Mobile Wallet Cash": "01222878019 (Cash Wallet)"
+    "InstaPay": "aura@instapay",
+    "Vodafone Cash": "01012345678 (Vodafone Cash Wallet)"
   };
 
   function addToOrderCart(styleName, costEGP) {
@@ -413,6 +419,8 @@
   }
 
   async function executeOrderCheckout() {
+    const nameInput = document.getElementById('cust-name').value;
+    const contactInput = document.getElementById('cust-contact').value;
     const addressInput = document.getElementById('cust-shipping').value;
     const chosenMethod = document.getElementById('payment-method').value;
 
@@ -421,24 +429,18 @@
       return;
     }
 
-    if (!addressInput.trim()) {
-      alert("Please specify a valid delivery shipping address.");
+    if (!nameInput.trim() || !contactInput.trim() || !addressInput.trim()) {
+      alert("Please fill in your Name, Contact details, and Shipping Address.");
       return;
     }
 
-    const { data: { user } } = await localSupabase.auth.getUser();
-    if (!user) {
-      alert("Please log in first before completing an order context.");
-      window.location.href = 'index.html';
-      return;
-    }
-
-    // Step 1: Write order entry data down directly to your Supabase public table matrix
+    // Save guest order data straight to Supabase orders matrix
     const { error: dbError } = await localSupabase
       .from('orders')
       .insert([
         {
-          user_id: user.id,
+          customer_name: nameInput,
+          customer_contact: contactInput,
           items: dynamicCart,
           total_amount: orderTotalEGP,
           shipping_address: addressInput,
@@ -448,7 +450,7 @@
       ]);
 
     if (dbError) {
-      alert("Could not process order queue into system database: " + dbError.message);
+      alert("Could not process order context entry: " + dbError.message);
       return;
     }
 
@@ -459,13 +461,15 @@
   }
 
   function confirmPaymentAndClose() {
-    alert("Thank you! Your order has been submitted, pending verification, you will get the confirmation shortly.");
+    alert("Thank you! Your guest order has been submitted. Our team will manually match your payment transfer against the ledger to fulfill your delivery.");
     document.getElementById('p2p-modal').style.display = 'none';
-    // Clear shopping cart state parameters
+    
     dynamicCart = [];
     orderTotalEGP = 0;
     document.getElementById('cart-item-count').innerText = "0";
     document.getElementById('cart-price-total').innerText = "0 EGP";
+    document.getElementById('cust-name').value = "";
+    document.getElementById('cust-contact').value = "";
     document.getElementById('cust-shipping').value = "";
   }
 </script>
