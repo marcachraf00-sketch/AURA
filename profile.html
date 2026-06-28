@@ -111,6 +111,7 @@
     to { text-shadow: 0 0 12px rgba(0, 255, 136, 0.6); }
   }
 
+  /* Interests Presentation Layout */
   .interests-section {
     text-align: left;
     margin-bottom: 28px;
@@ -266,6 +267,8 @@
     max-width: 360px;
     width: 100%;
     box-sizing: border-box;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .modal-box h3 {
@@ -300,6 +303,86 @@
     outline: none;
     border-color: #3b82f6;
   }
+
+  /* Advanced Searchable Multi-Select Elements */
+  .search-dropdown-wrapper {
+    position: relative;
+    margin-bottom: 14px;
+    text-align: left;
+  }
+
+  .selected-tags-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0f172a;
+    border-radius: 8px;
+    min-height: 38px;
+    box-sizing: border-box;
+    margin-bottom: 6px;
+  }
+
+  .tag-bubble {
+    background: #3b82f6;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tag-bubble span {
+    cursor: pointer;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+  .tag-bubble span:hover { opacity: 1; }
+
+  .dropdown-options-list {
+    display: none;
+    position: absolute;
+    top: 100%; left: 0; width: 100%;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    max-height: 130px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  .dropdown-item {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #cbd5e1;
+    cursor: pointer;
+  }
+  .dropdown-item:hover {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+  }
+
+  /* Modern Upload Button Component */
+  .upload-trigger-btn {
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px dashed rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+    padding: 10px;
+    font-size: 12px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .upload-trigger-btn:hover { background: rgba(56, 189, 248, 0.2); }
 </style>
 </head>
 
@@ -323,8 +406,7 @@
 
     <div class="interests-section">
       <span class="interests-label">Interests Matrix</span>
-      <div id="interests-container" class="interests-box">
-        </div>
+      <div id="interests-container" class="interests-box"></div>
     </div>
 
     <div class="stats-container">
@@ -366,13 +448,20 @@
     <label for="edit-age">Age</label>
     <input type="number" id="edit-age" placeholder="Enter age" min="1" max="120">
 
-    <label for="edit-avatar">Profile Picture Image URL</label>
-    <input type="text" id="edit-avatar" placeholder="Leave empty for fallback avatar">
+    <label>Profile Image Frame</label>
+    <input type="file" id="device-file-input" accept="image/*" style="display: none;">
+    <button type="button" class="upload-trigger-btn" id="upload-avatar-click">
+      📷 Upload Photo From Device
+    </button>
 
-    <label for="edit-interests">Interests (Comma Separated)</label>
-    <input type="text" id="edit-interests" placeholder="Networking, Tech, Marketing">
+    <label>Interests Matrix Sourcing</label>
+    <div class="search-dropdown-wrapper">
+      <div class="selected-tags-preview" id="chips-container"></div>
+      <input type="text" id="interest-search-bar" placeholder="Type to filter matrix tags..." style="margin-bottom:0;">
+      <div class="dropdown-options-list" id="dropdown-list-items"></div>
+    </div>
 
-    <div class="btn-group" style="margin-top: 10px;">
+    <div class="btn-group" style="margin-top: 18px;">
       <button class="primary-btn" id="save-profile-btn">Save Identity</button>
       <button id="close-modal-btn" style="background:transparent; border-color:transparent; color:#64748b;">Cancel</button>
     </div>
@@ -393,29 +482,28 @@
   let currentUserId = null;
   let currentXP = 0;
   let currentLevel = 1;
-  const XP_PER_LEVEL = 200; // Base metrics updated to 200 XP
+  const XP_PER_LEVEL = 200; 
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
+  
+  // Matrix Global Preset Configurations
+  const PRESET_INTERESTS = ["Tech", "Networking", "Marketing", "Design", "Development", "NFC", "AI", "Startup", "HR", "Sourcing", "Media Buying", "Apparel"];
+  let selectedInterests = [];
+  let tempBase64Avatar = "";
 
   function updateUI() {
     document.getElementById('level-val').innerText = currentLevel;
     document.getElementById('xp-val').innerText = currentXP + " / " + XP_PER_LEVEL + " XP";
-
-    const levelPercent = Math.min((currentLevel / 100) * 100, 100);
-    const xpPercent = Math.min((currentXP / XP_PER_LEVEL) * 100, 100);
-
-    document.getElementById('level-fill').style.width = levelPercent + "%";
-    document.getElementById('xp-fill').style.width = xpPercent + "%";
+    document.getElementById('level-fill').style.width = Math.min((currentLevel / 100) * 100, 100) + "%";
+    document.getElementById('xp-fill').style.width = Math.min((currentXP / XP_PER_LEVEL) * 100, 100) + "%";
   }
 
   function renderInterests(interestsArray) {
     const container = document.getElementById('interests-container');
     container.innerHTML = '';
-    
-    if (!interestsArray || interestsArray.length === 0 || (interestsArray.length === 1 && interestsArray[0].trim() === "")) {
+    if (!interestsArray || interestsArray.length === 0) {
       container.innerHTML = '<span class="no-interests">No matrix parameters added</span>';
       return;
     }
-
     interestsArray.forEach(interest => {
       if (interest.trim() !== "") {
         const tag = document.createElement('span');
@@ -426,15 +514,95 @@
     });
   }
 
+  // Live Dropdown Builder Core Logic
+  function updateModalChipsAndDropdown() {
+    const chipsContainer = document.getElementById('chips-container');
+    chipsContainer.innerHTML = '';
+    selectedInterests.forEach(interest => {
+      const chip = document.createElement('div');
+      chip.className = 'tag-bubble';
+      chip.innerHTML = `${interest} <span data-value="${interest}">×</span>`;
+      chipsContainer.appendChild(chip);
+    });
+
+    const filterText = document.getElementById('interest-search-bar').value.toLowerCase().trim();
+    const dropdownList = document.getElementById('dropdown-list-items');
+    dropdownList.innerHTML = '';
+
+    const matches = PRESET_INTERESTS.filter(item => 
+      item.toLowerCase().includes(filterText) && !selectedInterests.includes(item)
+    );
+
+    if (matches.length > 0) {
+      matches.forEach(item => {
+        const option = document.createElement('div');
+        option.className = 'dropdown-item';
+        option.innerText = item;
+        option.addEventListener('click', () => {
+          selectedInterests.push(item);
+          document.getElementById('interest-search-bar').value = '';
+          updateModalChipsAndDropdown();
+        });
+        dropdownList.appendChild(option);
+      });
+    } else if (filterText !== "" && !selectedInterests.includes(filterText)) {
+      const customOption = document.createElement('div');
+      customOption.className = 'dropdown-item';
+      customOption.innerText = `Add Custom: "${filterText}"`;
+      customOption.addEventListener('click', () => {
+        selectedInterests.push(filterText);
+        document.getElementById('interest-search-bar').value = '';
+        updateModalChipsAndDropdown();
+      });
+      dropdownList.appendChild(customOption);
+    }
+  }
+
+  // Base64 File Extraction Processing Pipeline
+  document.getElementById('upload-avatar-click').addEventListener('click', () => {
+    document.getElementById('device-file-input').click();
+  });
+
+  document.getElementById('device-file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      tempBase64Avatar = event.target.result;
+      document.getElementById('upload-avatar-click').innerText = "✅ Photo Attached Successfully";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Modal Close Intercepts
+  document.getElementById('chips-container').addEventListener('click', (e) => {
+    if (e.target.tagName === 'SPAN') {
+      const valToRemove = e.target.getAttribute('data-value');
+      selectedInterests = selectedInterests.filter(i => i !== valToRemove);
+      updateModalChipsAndDropdown();
+    }
+  });
+
+  document.getElementById('interest-search-bar').addEventListener('focus', () => {
+    document.getElementById('dropdown-list-items').style.display = 'block';
+    updateModalChipsAndDropdown();
+  });
+
+  document.getElementById('interest-search-bar').addEventListener('input', updateModalChipsAndDropdown);
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-dropdown-wrapper')) {
+      document.getElementById('dropdown-list-items').style.display = 'none';
+    }
+  });
+
   async function loadProfile(){
     try {
       const { data:{user}, error: authError } = await localSupabase.auth.getUser();
-
       if(authError || !user){
         window.location.href = 'index.html';
         return;
       }
-
       currentUserId = user.id;
 
       const { data, error: dbError } = await localSupabase
@@ -446,46 +614,31 @@
       if(data){
         currentLevel = data.level || 1;
         currentXP = data.xp || 0;
-        
-        if (data.username) {
-          document.getElementById('name').innerText = data.username;
-          document.getElementById('edit-username').value = data.username;
-        } else {
-          document.getElementById('name').innerText = user.email.split('@')[0];
-          document.getElementById('edit-username').value = user.email.split('@')[0];
-        }
+        document.getElementById('name').innerText = data.username || user.email.split('@')[0];
+        document.getElementById('edit-username').value = data.username || user.email.split('@')[0];
 
         if (data.age) {
-          const ageEl = document.getElementById('age-display');
-          ageEl.innerText = "Age: " + data.age;
-          ageEl.style.display = 'inline-block';
+          document.getElementById('age-display').innerText = "Age: " + data.age;
+          document.getElementById('age-display').style.display = 'inline-block';
           document.getElementById('edit-age').value = data.age;
-        } else {
-          document.getElementById('age-display').style.display = 'none';
         }
 
         if (data.avatar_url && data.avatar_url.trim() !== "") {
           document.getElementById('user-avatar').src = data.avatar_url;
-          document.getElementById('edit-avatar').value = data.avatar_url;
+          tempBase64Avatar = data.avatar_url;
         } else {
           document.getElementById('user-avatar').src = FALLBACK_AVATAR;
-          document.getElementById('edit-avatar').value = "";
         }
 
-        // Custom interests array layout split
-        let interestsArr = [];
         if (Array.isArray(data.interests)) {
-          interestsArr = data.interests;
+          selectedInterests = data.interests;
         } else if (typeof data.interests === 'string' && data.interests.trim() !== "") {
-          interestsArr = data.interests.split(',');
+          selectedInterests = data.interests.split(',');
         }
-        renderInterests(interestsArr);
-        document.getElementById('edit-interests').value = interestsArr.join(', ');
-        
+        renderInterests(selectedInterests);
         updateUI();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('source') === 'nfc') {
+        if (new URLSearchParams(window.location.search).get('source') === 'nfc') {
           handleNFCTap();
         }
       } else {
@@ -493,40 +646,26 @@
         document.getElementById('user-avatar').src = FALLBACK_AVATAR;
         updateUI();
       }
-
     } catch (err) {
-      console.error("Initialization pipeline exception caught:", err);
+      console.error(err);
     }
-
-    // Always clear the blocking loading splash unless a hard crash blocks it
     document.getElementById('loading-msg').style.display = 'none';
     document.getElementById('profile-content').style.display = 'block';
   }
 
   async function handleNFCTap() {
     currentXP += 5;
-    if (currentXP >= XP_PER_LEVEL) {
-      currentXP -= XP_PER_LEVEL;
-      currentLevel += 1;
-    }
+    if (currentXP >= XP_PER_LEVEL) { currentXP -= XP_PER_LEVEL; currentLevel += 1; }
     updateUI();
-
-    const statusSubtitle = document.getElementById('status-sub');
-    statusSubtitle.innerText = "⚡ NFC Tap Detected: +5 XP Added!";
-    statusSubtitle.classList.add('nfc-active');
-
-    const { error } = await localSupabase.rpc('increment_xp', { 
-      user_id: currentUserId, 
-      xp_to_add: 5 
-    });
-
-    if (error) {
-      console.error("NFC transaction failed sync:", error.message);
-    }
+    const sub = document.getElementById('status-sub');
+    sub.innerText = "⚡ NFC Tap Detected: +5 XP Added!";
+    sub.classList.add('nfc-active');
+    await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 5 });
   }
 
   document.getElementById('edit-profile-btn').addEventListener('click', () => {
     document.getElementById('edit-modal').style.display = 'flex';
+    updateModalChipsAndDropdown();
   });
 
   document.getElementById('close-modal-btn').addEventListener('click', () => {
@@ -534,40 +673,27 @@
   });
 
   document.getElementById('save-profile-btn').addEventListener('click', async () => {
-    const updatedName = document.getElementById('edit-username').value.trim();
-    const updatedAge = parseInt(document.getElementById('edit-age').value) || null;
-    const updatedAvatar = document.getElementById('edit-avatar').value.trim();
-    const rawInterests = document.getElementById('edit-interests').value;
-    
-    const updatedInterestsArr = rawInterests.split(',').map(i => i.trim()).filter(i => i !== "");
+    const nameVal = document.getElementById('edit-username').value.trim();
+    const ageVal = parseInt(document.getElementById('edit-age').value) || null;
 
-    document.getElementById('name').innerText = updatedName;
-    if (updatedAge) {
-      const ageDisplay = document.getElementById('age-display');
-      ageDisplay.innerText = "Age: " + updatedAge;
-      ageDisplay.style.display = 'inline-block';
+    document.getElementById('name').innerText = nameVal;
+    if (ageVal) {
+      document.getElementById('age-display').innerText = "Age: " + ageVal;
+      document.getElementById('age-display').style.display = 'inline-block';
     } else {
       document.getElementById('age-display').style.display = 'none';
     }
     
-    document.getElementById('user-avatar').src = updatedAvatar !== "" ? updatedAvatar : FALLBACK_AVATAR;
-    renderInterests(updatedInterestsArr);
-
+    document.getElementById('user-avatar').src = tempBase64Avatar !== "" ? tempBase64Avatar : FALLBACK_AVATAR;
+    renderInterests(selectedInterests);
     document.getElementById('edit-modal').style.display = 'none';
 
-    const { error } = await localSupabase
-      .from('profiles')
-      .update({
-        username: updatedName,
-        age: updatedAge,
-        avatar_url: updatedAvatar,
-        interests: updatedInterestsArr
-      })
-      .eq('id', currentUserId);
-
-    if (error) {
-      alert("Error syncing data profile parameters: " + error.message);
-    }
+    await localSupabase.from('profiles').update({
+      username: nameVal,
+      age: ageVal,
+      avatar_url: tempBase64Avatar,
+      interests: selectedInterests
+    }).eq('id', currentUserId);
   });
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
