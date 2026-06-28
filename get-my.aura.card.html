@@ -38,12 +38,6 @@
     color: #ffffff;
   }
 
-  .subtitle {
-    color: #94a3b8;
-    font-size: 15px;
-    margin: 0;
-  }
-
   .section-title {
     font-size: 18px;
     font-weight: 600;
@@ -167,7 +161,6 @@
     color: #f472b6 !important;
   }
 
-  /* Input Forms Elements */
   .checkout-section {
     background: rgba(255, 255, 255, 0.01);
     border: 1px solid rgba(255, 255, 255, 0.04);
@@ -257,7 +250,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  /* Custom Payment Overlay Modal */
   .payment-modal {
     display: none;
     position: fixed;
@@ -390,7 +382,7 @@
     </div>
 
     <p style="font-size:13px; color:#e2e8f0; font-weight:600;">Total Amount: <span id="modal-amount-display" style="color:#34d399;">0 EGP</span></p>
-    <p style="font-size:12px; color:#64748b; margin-bottom:20px;">Once paid, our team will verify your transaction ledger record and fulfill the shipment within 48 hours.</p>
+    <p style="font-size:12px; color:#64748b; margin-bottom:20px;">Once paid, click the button below to complete registration processing.</p>
 
     <button class="pay-btn" onclick="window.confirmPaymentAndClose()">I Have Transferred Successfully</button>
   </div>
@@ -398,7 +390,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Initialize Supabase Client securely
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
@@ -422,22 +413,9 @@
       
       if (countEl) countEl.innerText = window.dynamicCart.length;
       if (totalEl) totalEl.innerText = window.orderTotalEGP.toLocaleString() + " EGP";
-      
-      console.log(`Added ${styleName}. Total: ${window.orderTotalEGP} EGP`);
     } catch (err) {
       console.error("Error in addToOrderCart:", err);
     }
-  };
-
-  window.resetFormAndCart = function() {
-    window.dynamicCart = [];
-    window.orderTotalEGP = 0;
-    
-    if (document.getElementById('cart-item-count')) document.getElementById('cart-item-count').innerText = "0";
-    if (document.getElementById('cart-price-total')) document.getElementById('cart-price-total').innerText = "0 EGP";
-    if (document.getElementById('cust-name')) document.getElementById('cust-name').value = "";
-    if (document.getElementById('cust-contact')) document.getElementById('cust-contact').value = "";
-    if (document.getElementById('cust-shipping')) document.getElementById('cust-shipping').value = "";
   };
 
   window.executeOrderCheckout = async function() {
@@ -459,7 +437,6 @@
     const dbStatus = chosenMethod === 'Cash on Delivery' ? 'pending_delivery' : 'pending_verification';
 
     try {
-      // Save order record to live Supabase backend instance matrix
       const { error: dbError } = await localSupabase
         .from('orders')
         .insert([
@@ -480,8 +457,8 @@
       }
 
       if (chosenMethod === 'Cash on Delivery') {
-        alert("Thank you! Your Cash on Delivery order has been submitted successfully. Our team will process your fulfillment and prepare the package within 48 hours.");
-        window.resetFormAndCart();
+        // Redirect directly for Cash on Delivery
+        window.location.href = "orderplaced.html";
       } else {
         document.getElementById('modal-method-title').innerText = chosenMethod;
         document.getElementById('modal-transfer-details').innerText = P2P_DETAILS[chosenMethod] || "";
@@ -494,9 +471,8 @@
   };
 
   window.confirmPaymentAndClose = function() {
-    alert("Thank you! Your guest order has been submitted. Our team will manually match your payment transfer against the ledger to fulfill your delivery.");
-    if (document.getElementById('p2p-modal')) document.getElementById('p2p-modal').style.display = 'none';
-    window.resetFormAndCart();
+    document.getElementById('p2p-modal').style.display = 'none';
+    window.location.href = "orderplaced.html";
   };
 </script>
 
