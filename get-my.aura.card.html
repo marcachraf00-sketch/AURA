@@ -20,7 +20,6 @@
     letter-spacing: -0.01em;
   }
 
-  /* Glassmorphic Container Layout */
   .store-container {
     width: 100%;
     max-width: 900px;
@@ -45,7 +44,6 @@
     margin: 0;
   }
 
-  /* Section Headings */
   .section-title {
     font-size: 18px;
     font-weight: 600;
@@ -65,7 +63,6 @@
     padding-left: 0;
   }
 
-  /* Product Selection Grid */
   .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -73,7 +70,6 @@
     margin-bottom: 32px;
   }
 
-  /* Centered Single Layout for Exclusive Card */
   .exclusive-center-container {
     display: flex;
     justify-content: center;
@@ -83,7 +79,6 @@
     padding: 10px 0;
   }
 
-  /* Animated Ambient Glow Effects Around the Exclusive Card Wrapper */
   .exclusive-glow-wrapper {
     position: relative;
     border-radius: 20px;
@@ -125,9 +120,8 @@
     box-shadow: 0 12px 24px -10px rgba(59, 130, 246, 0.15);
   }
 
-  /* Girly Exclusive Internal Restyle Override */
   .product-card.girly-exclusive {
-    border: none; /* Relies on wrapper glowing gradient border */
+    border: none;
   }
 
   .exclusive-glow-wrapper:hover {
@@ -136,7 +130,6 @@
     box-shadow: 0 0 35px rgba(244, 114, 182, 0.45);
   }
 
-  /* Card Image Display Styling */
   .card-preview-img {
     width: 100%;
     height: 130px;
@@ -151,7 +144,6 @@
     transform: scale(1.04) rotate(-1deg);
   }
 
-  /* Ambient soft pulsate behind exclusive picture frame */
   .girly-exclusive .card-preview-img {
     animation: imagePulse 3s ease-in-out infinite alternate;
   }
@@ -284,7 +276,6 @@
   <div class="section-title">Core Collection</div>
   <div class="product-grid">
     
-    <!-- Card 1: Standard -->
     <div class="product-card">
       <img src="standard.png" alt="Aura Standard Card" class="card-preview-img">
       <div>
@@ -294,7 +285,6 @@
       </div>
     </div>
 
-    <!-- Card 2: Prism -->
     <div class="product-card">
       <img src="prism.png" alt="Aura Prism Card" class="card-preview-img">
       <div>
@@ -304,7 +294,6 @@
       </div>
     </div>
 
-    <!-- Card 3: Profile Pro -->
     <div class="product-card">
       <img src="profilepro.png" alt="Aura Profile Pro Card" class="card-preview-img">
       <div>
@@ -314,7 +303,6 @@
       </div>
     </div>
 
-    <!-- Card 4: Void -->
     <div class="product-card">
       <img src="void.png" alt="Aura Void Card" class="card-preview-img">
       <div>
@@ -326,7 +314,6 @@
 
   </div>
 
-  <!-- Centered & Styled Girly Exclusive Selection Segment -->
   <div class="section-title girly">✨ Exclusive Edition ✨</div>
   <div class="exclusive-center-container">
     <div class="exclusive-glow-wrapper">
