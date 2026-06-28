@@ -381,6 +381,62 @@
     width: 100%;
   }
   .upload-trigger-btn:hover { background: rgba(56, 189, 248, 0.2); }
+
+  /* Integrated Operational Challenges Styles */
+  .challenges-box {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  .challenge-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 3px solid #3b82f6;
+    padding: 8px 10px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 8px;
+  }
+
+  .challenge-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .challenge-card.streak {
+    border-left-color: #10b981;
+  }
+
+  .challenge-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .challenge-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+
+  .challenge-badge {
+    font-size: 9px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .challenge-card.streak .challenge-badge {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+  }
 </style>
 </head>
 
@@ -445,6 +501,25 @@
 
     <label for="edit-age">Age</label>
     <input type="number" id="edit-age" placeholder="Enter age" min="1" max="120">
+
+    <!-- Active Operational Core Challenges Box Layout -->
+    <label>Active Matrix Objectives</label>
+    <div class="challenges-box">
+      <div class="challenge-card">
+        <div class="challenge-title">
+          <span>🤝 The Icebreaker</span>
+          <span class="challenge-badge">Daily</span>
+        </div>
+        <div class="challenge-desc">Tap your Aura card with 3 new people in a single day.</div>
+      </div>
+      <div class="challenge-card streak">
+        <div class="challenge-title">
+          <span>🔥 The Regular</span>
+          <span class="challenge-badge">Streak</span>
+        </div>
+        <div class="challenge-desc">Maintain a 3-day "Networking Streak" by tapping your card at least once a day.</div>
+      </div>
+    </div>
 
     <label>Profile Image Frame</label>
     <input type="file" id="device-file-input" accept="image/*" style="display: none;">
@@ -633,7 +708,6 @@
         renderInterests(selectedInterests);
         updateUI();
 
-        // Step 3 Integration: Secure URL Query Parameter Scan Extraction
         const urlParams = new URLSearchParams(window.location.search);
         const scanId = urlParams.get('scan_id');
 
@@ -669,7 +743,6 @@
     document.getElementById('profile-content').style.display = 'block';
   }
 
-  // Step 4 Integration: Structural Database-first Validation Architecture
   async function handleSecureNFCTap(scanId) {
     const sub = document.getElementById('status-sub');
     
