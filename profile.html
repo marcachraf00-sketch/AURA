@@ -139,8 +139,9 @@
   .challenge-meta {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 6px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 12px;
   }
 
   .challenge-name {
@@ -149,16 +150,30 @@
     color: #e2e8f0;
   }
 
+  .challenge-description {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 3px;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
   .challenge-item.completed .challenge-name {
     color: #10b981;
     text-decoration: line-through;
     text-decoration-color: rgba(16, 185, 129, 0.4);
   }
 
+  .challenge-item.completed .challenge-description {
+    color: rgba(16, 185, 129, 0.6);
+  }
+
   .challenge-progress-text {
     font-size: 12px;
     font-weight: 700;
     color: #64748b;
+    white-space: nowrap;
+    text-align: right;
   }
 
   .challenge-item.completed .challenge-progress-text {
@@ -534,7 +549,6 @@
 <div class="dashboard-grid">
   <div id="loading-msg">Connecting to network link...</div>
 
-  <!-- Left Side: Profile Card Pane -->
   <div class="profile-wrapper" id="profile-content" style="display: none;">
     <div class="avatar-container">
       <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator" alt="Profile Picture" class="profile-pic">
@@ -577,15 +591,16 @@
     </div>
   </div>
 
-  <!-- Right Side: Live Challenge Board Pane (Calculated from DB) -->
   <div class="challenges-panel" id="challenges-content" style="display: none;">
     <h3 class="panel-title">⚡ Matrix Objectives</h3>
     <ul class="challenge-list">
       
-      <!-- Challenge Item 1: Total Taps -->
       <li class="challenge-item" id="ch-icebreaker">
         <div class="challenge-meta">
-          <span class="challenge-name">The Icebreaker</span>
+          <div>
+            <span class="challenge-name">The Icebreaker</span>
+            <div class="challenge-description">Tap your Aura card with 3 new people in a single day.</div>
+          </div>
           <span class="challenge-progress-text" id="icebreaker-txt">0 / 3</span>
         </div>
         <div class="challenge-bar-bg">
@@ -593,10 +608,12 @@
         </div>
       </li>
 
-      <!-- Challenge Item 2: Unique Activity Days -->
       <li class="challenge-item" id="ch-regular">
         <div class="challenge-meta">
-          <span class="challenge-name">The Regular</span>
+          <div>
+            <span class="challenge-name">The Regular</span>
+            <div class="challenge-description">Maintain a 3-day "Networking Streak" by tapping your card at least once a day.</div>
+          </div>
           <span class="challenge-progress-text" id="regular-txt">0 / 3 Days</span>
         </div>
         <div class="challenge-bar-bg">
@@ -659,13 +676,13 @@
   let selectedInterests = [];
   let tempBase64Avatar = "";
 
-  // Challenge Local structural tracking rules
+  // Challenge Local Configuration Model
   let challengeState = {
     icebreaker: { current: 0, target: 3, completed: false, key: 'ch-icebreaker', txtId: 'icebreaker-txt', fillId: 'icebreaker-fill' },
     regular: { current: 0, target: 3, completed: false, key: 'ch-regular', txtId: 'regular-txt', fillId: 'regular-fill', suffix: ' Days' }
   };
 
-  // High Performance Celebration Particle System
+  // Canvas Particle Animation Engine
   const canvas = document.getElementById('celebration-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
@@ -723,7 +740,7 @@
   }
   requestAnimationFrame(renderCelebration);
 
-  // Directly sets challenge progress values and triggers particles ONLY when newly completed
+  // Challenge Execution State Processor
   function setChallengeProgress(key, currentVal) {
     let ch = challengeState[key];
     ch.current = Math.min(currentVal, ch.target);
@@ -743,7 +760,7 @@
     }
   }
 
-  // Live calculation function pulling directly from verified db transactions
+  // Live Metric Aggregator Framework
   async function calculateRealChallenges(userId) {
     try {
       const { data: scans, error } = await localSupabase
@@ -760,15 +777,14 @@
         return;
       }
 
-      // 1. Icebreaker = Count of real verified scans total
-      const totalScansCount = scans.length;
-      setChallengeProgress('icebreaker', totalScansCount);
+      // Objective 1: Icebreaker calculations
+      setChallengeProgress('icebreaker', scans.length);
 
-      // 2. Regular = Unique Calendar Days
+      // Objective 2: Continuous unique calendar days tracker calculation
       const uniqueDays = new Set();
       scans.forEach(scan => {
         if (scan.claimed_at) {
-          const dateStr = scan.claimed_at.split('T')[0]; // Extract YYYY-MM-DD
+          const dateStr = scan.claimed_at.split('T')[0]; 
           uniqueDays.add(dateStr);
         }
       });
@@ -924,7 +940,7 @@
         renderInterests(selectedInterests);
         updateUI();
 
-        // RUN real database verification calculations rather than fake numbers
+        // Load real live metrics from db
         await calculateRealChallenges(currentUserId);
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -987,7 +1003,7 @@
     }
     updateUI();
     
-    // Automatically recalculate metrics immediately after a live transaction finishes
+    // Automatically recalculate metrics immediately after a transaction updates
     await calculateRealChallenges(currentUserId);
 
     await localSupabase.rpc('increment_xp', { user_id: currentUserId, xp_to_add: 5 });
