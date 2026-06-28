@@ -333,6 +333,7 @@
 
   #level-val { color: #38bdf8; }
   #xp-val { color: #34d399; }
+  #taps-val { color: #fbbf24; } /* Custom highlight color for Taps counter */
 
   .progress-bar-bg {
     width: 100%;
@@ -566,6 +567,16 @@
     <div class="stats-container">
       <div class="stat-item">
         <div class="stat-info">
+          <span class="stat-label">Total Matrix Taps</span>
+          <span class="stat-value" id="taps-val">0</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="taps-fill" style="background: linear-gradient(90deg, #d97706, #fbbf24); width: 100%; box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);"></div>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-info">
           <span class="stat-label">Level</span>
           <span class="stat-value" id="level-val">1</span>
         </div>
@@ -669,6 +680,7 @@
   let currentUserId = null;
   let currentXP = 0;
   let currentLevel = 1;
+  let totalTaps = 0; // Local data variable tracking total taps
   const XP_PER_LEVEL = 200; 
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
   
@@ -740,7 +752,6 @@
   }
   requestAnimationFrame(renderCelebration);
 
-  // Challenge Execution State Processor
   function setChallengeProgress(key, currentVal) {
     let ch = challengeState[key];
     ch.current = Math.min(currentVal, ch.target);
@@ -812,6 +823,7 @@
   }
 
   function updateUI() {
+    document.getElementById('taps-val').innerText = totalTaps; // Sync visual taps layout
     document.getElementById('level-val').innerText = currentLevel;
     document.getElementById('xp-val').innerText = currentXP + " / " + XP_PER_LEVEL + " XP";
     document.getElementById('level-fill').style.width = Math.min((currentLevel / 100) * 100, 100) + "%";
@@ -962,6 +974,7 @@
       if(data){
         currentLevel = data.level || 1;
         currentXP = data.xp || 0;
+        totalTaps = data.tap_count || 0; // Retrieve tap count integer values from database
         document.getElementById('name').innerText = data.username || user.email.split('@')[0];
         document.getElementById('edit-username').value = data.username || user.email.split('@')[0];
 
@@ -1044,6 +1057,11 @@
       return;
     }
 
+    // ATOMIC HIT DETECTED: Increment total card tap metrics both on server and locally
+    totalTaps += 1;
+    localSupabase.rpc('increment_tap_count', { profile_uuid: currentUserId })
+      .then(({ error }) => { if (error) console.error("Tap RPC tracking failure:", error); });
+
     currentXP += 20;
     if (currentXP >= XP_PER_LEVEL) { 
       currentXP -= XP_PER_LEVEL; 
@@ -1084,13 +1102,14 @@
     renderInterests(selectedInterests);
     document.getElementById('edit-modal').style.display = 'none';
 
-    // Using .upsert ensures the row is either inserted or completely overridden cleanly matching on the primary key id
+    // Added tap_count to upsert fields so data parameters don't reset to 0 upon identity saves
     const { error } = await localSupabase.from('profiles').upsert({
       id: currentUserId, 
       username: nameVal,
       age: ageVal,
       avatar_url: tempBase64Avatar,
-      interests: selectedInterests
+      interests: selectedInterests,
+      tap_count: totalTaps 
     });
 
     if (error) {
