@@ -923,6 +923,7 @@
 
   async function loadProfile(){
     try {
+      alert("URL Check -> Scan: " + scanId + " | Owner: " + ownerIdFromUrl);
       const urlParams = new URLSearchParams(window.location.search);
       const scanId = urlParams.get('scan_id');
       const ownerIdFromUrl = urlParams.get('owner_id'); 
