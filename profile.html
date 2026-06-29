@@ -744,8 +744,7 @@
       const { data: scans, error } = await localSupabase
         .from('nfc_scans')
         .select('*')
-        .eq('claimed_by', userId)
-        .eq('claimed', true);
+        .eq('claimed_by', userId);
 
       if (error) throw error;
       if (!scans || scans.length === 0) {
@@ -754,8 +753,13 @@
         return;
       }
 
-      const todayStr = new Date().toISOString().split('T')[0];
-      const tapsToday = scans.filter(s => s.claimed_at && s.claimed_at.split('T')[0] === todayStr).length;
+      const todayStr = new Date().toLocaleDateString('sv-SE'); 
+      
+      const tapsToday = scans.filter(s => {
+        if (!s.claimed_at) return false;
+        return s.claimed_at.startsWith(todayStr);
+      }).length;
+      
       setChallengeProgress('icebreaker', tapsToday);
 
       const uniqueDays = new Set();
@@ -992,7 +996,6 @@
     window.location.href = 'index.html';
   });
 
-  // REALTIME REAL-TIME UPDATE FOR XP AND OBJECTIVES
   function initializeRealtimeEngine(activeId) {
     if (!activeId) return;
     console.log("⚡ Realtime Engine monitoring Operator Link ID:", activeId);
@@ -1021,7 +1024,7 @@
       .on(
         'postgres_changes',
         {
-          event: '*', // 👈 Listens to ALL modifications (Insert/Updates) from your scan script
+          event: '*', 
           schema: 'public',
           table: 'nfc_scans',
           filter: `claimed_by=eq.${activeId}` 
@@ -1029,10 +1032,8 @@
         async (payload) => {
           console.log('⚡ Realtime Card Tap Logged! Running server-side logic...', payload);
           
-          // 1. Recalculate challenge parameters visually on the dashboard
           await calculateRealChallenges(activeId);
 
-          // 2. Trigger the database RPC function securely to handle background XP increments
           const { error } = await localSupabase.rpc('handle_nfc_tap_xp', { operator_id: activeId });
           
           if (error) {
