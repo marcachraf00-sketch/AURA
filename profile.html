@@ -256,16 +256,6 @@
     transition: color 0.3s;
   }
 
-  .subtitle.nfc-active {
-    color: #00ff88;
-    animation: pulse 1.5s infinite alternate;
-  }
-
-  @keyframes pulse {
-    from { text-shadow: 0 0 4px rgba(0, 255, 136, 0.2); }
-    to { text-shadow: 0 0 12px rgba(0, 255, 136, 0.6); }
-  }
-
   .interests-section {
     text-align: left;
     margin-bottom: 28px;
@@ -453,11 +443,6 @@
     font-size: 14px;
   }
 
-  input:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-
   .search-dropdown-wrapper {
     position: relative;
     margin-bottom: 14px;
@@ -534,7 +519,6 @@
     gap: 8px;
     width: 100%;
   }
-  .upload-trigger-btn:hover { background: rgba(56, 189, 248, 0.2); }
 </style>
 </head>
 
@@ -754,7 +738,6 @@
     }
   }
 
-  // COMPLETE FIX FOR XP & DAILY STREAK PIPELINE
   async function calculateRealChallenges(userId) {
     if (!userId) return;
     try {
@@ -771,12 +754,10 @@
         return;
       }
 
-      // 1. Update Icebreaker count (Total Taps Today)
       const todayStr = new Date().toISOString().split('T')[0];
       const tapsToday = scans.filter(s => s.claimed_at && s.claimed_at.split('T')[0] === todayStr).length;
       setChallengeProgress('icebreaker', tapsToday);
 
-      // 2. Calculate unique streak days
       const uniqueDays = new Set();
       scans.forEach(scan => {
         if (scan.claimed_at) {
@@ -785,8 +766,6 @@
       });
       setChallengeProgress('regular', uniqueDays.size);
 
-      // 3. Automated Level Engine: If this is a new scan event context, evaluate XP allocation
-      return { totalUniqueDays: uniqueDays.size, totalScansCount: scans.length };
     } catch (err) {
       console.error("Error evaluating live matrix objectives:", err);
     }
@@ -1003,7 +982,6 @@
       alert("Profile Sync Failed: " + error.message);
     } else {
       document.getElementById('edit-modal').style.display = 'none';
-      
       const { data: updatedData } = await localSupabase.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
       if (updatedData) renderLoadedProfile(updatedData);
     }
@@ -1030,7 +1008,7 @@
           filter: `id=eq.${activeId}` 
         },
         (payload) => {
-          console.log('⚡ Realtime Profile Update:', payload.new);
+          console.log('⚡ Profile updated in database! Syncing UI elements...', payload.new);
           currentLevel = payload.new.level || 1;
           currentXP = payload.new.xp || 0;
           updateUI();
@@ -1049,24 +1027,19 @@
           filter: `claimed_by=eq.${activeId}` 
         },
         async (payload) => {
-          console.log('⚡ Realtime Card Tap Logged! Calculating challenges and giving XP...');
+          console.log('⚡ Realtime Card Tap Logged! Running server-side logic...');
           
-          // Recalculate challenges dashboard values
+          // 1. Recalculate challenges visually on the dashboard
           await calculateRealChallenges(activeId);
 
-          // Give +25 XP automatically on every new scan tracked
-          let addedXp = currentXP + 25;
-          let nextLevel = currentLevel;
-          if (addedXp >= XP_PER_LEVEL) {
-            addedXp -= XP_PER_LEVEL;
-            nextLevel += 1;
+          // 2. Trigger the database RPC function securely to calculate XP and Level increments
+          const { error } = await localSupabase.rpc('handle_nfc_tap_xp', { operator_id: activeId });
+          
+          if (error) {
+            console.error("❌ Database Function Execution Failed:", error.message);
+          } else {
+            console.log("✅ Database RPC function executed. Stats updated cleanly!");
           }
-
-          // Push the calculated level changes back to Supabase profiles matrix
-          await localSupabase
-            .from('profiles')
-            .update({ xp: addedXp, level: nextLevel })
-            .eq('id', activeId);
         }
       )
       .subscribe();
