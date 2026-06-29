@@ -67,7 +67,6 @@
         statusDisplay.style.color = '#94a3b8';
         statusDisplay.innerText = "Querying credentials...";
 
-        // 1. Grab the currently logged-in user from Auth session context
         const { data: { user }, error: authError } = await clientSupabase.auth.getUser();
 
         if (authError || !user) {
@@ -76,7 +75,6 @@
             return;
         }
 
-        // 2. Insert the mapping into your new user_cards table
         const { error: insertError } = await clientSupabase
             .from('user_cards')
             .insert([{ card_id: cardId, user_id: user.id }]);
