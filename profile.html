@@ -754,22 +754,13 @@
     }
   }
 
-  function getLastFridayMidnight() {
-    const now = new Date();
-    const lastFriday = new Date(now);
-    const currentDay = now.getDay();
-    const daysSinceFriday = (currentDay + 2) % 7; 
-    lastFriday.setDate(now.getDate() - daysSinceFriday);
-    lastFriday.setHours(0, 0, 0, 0);
-    return lastFriday.toISOString();
-  }
-
+  // COMPLETE FIX FOR XP & DAILY STREAK PIPELINE
   async function calculateRealChallenges(userId) {
     if (!userId) return;
     try {
       const { data: scans, error } = await localSupabase
         .from('nfc_scans')
-        .select('claimed_at')
+        .select('*')
         .eq('claimed_by', userId)
         .eq('claimed', true);
 
@@ -780,16 +771,22 @@
         return;
       }
 
-      setChallengeProgress('icebreaker', scans.length);
+      // 1. Update Icebreaker count (Total Taps Today)
+      const todayStr = new Date().toISOString().split('T')[0];
+      const tapsToday = scans.filter(s => s.claimed_at && s.claimed_at.split('T')[0] === todayStr).length;
+      setChallengeProgress('icebreaker', tapsToday);
 
+      // 2. Calculate unique streak days
       const uniqueDays = new Set();
       scans.forEach(scan => {
         if (scan.claimed_at) {
-          const dateStr = scan.claimed_at.split('T')[0]; 
-          uniqueDays.add(dateStr);
+          uniqueDays.add(scan.claimed_at.split('T')[0]);
         }
       });
       setChallengeProgress('regular', uniqueDays.size);
+
+      // 3. Automated Level Engine: If this is a new scan event context, evaluate XP allocation
+      return { totalUniqueDays: uniqueDays.size, totalScansCount: scans.length };
     } catch (err) {
       console.error("Error evaluating live matrix objectives:", err);
     }
@@ -1017,6 +1014,7 @@
     window.location.href = 'index.html';
   });
 
+  // REALTIME REAL-TIME UPDATE FOR XP AND OBJECTIVES
   function initializeRealtimeEngine(activeId) {
     if (!activeId) return;
     console.log("⚡ Realtime Engine monitoring Operator Link ID:", activeId);
@@ -1033,7 +1031,9 @@
         },
         (payload) => {
           console.log('⚡ Realtime Profile Update:', payload.new);
-          renderLoadedProfile(payload.new);
+          currentLevel = payload.new.level || 1;
+          currentXP = payload.new.xp || 0;
+          updateUI();
         }
       )
       .subscribe();
@@ -1048,9 +1048,25 @@
           table: 'nfc_scans',
           filter: `claimed_by=eq.${activeId}` 
         },
-        (payload) => {
-          console.log('⚡ Realtime Card Tap Logged! Recalculating Matrix Objectives...');
-          calculateRealChallenges(activeId);
+        async (payload) => {
+          console.log('⚡ Realtime Card Tap Logged! Calculating challenges and giving XP...');
+          
+          // Recalculate challenges dashboard values
+          await calculateRealChallenges(activeId);
+
+          // Give +25 XP automatically on every new scan tracked
+          let addedXp = currentXP + 25;
+          let nextLevel = currentLevel;
+          if (addedXp >= XP_PER_LEVEL) {
+            addedXp -= XP_PER_LEVEL;
+            nextLevel += 1;
+          }
+
+          // Push the calculated level changes back to Supabase profiles matrix
+          await localSupabase
+            .from('profiles')
+            .update({ xp: addedXp, level: nextLevel })
+            .eq('id', activeId);
         }
       )
       .subscribe();
