@@ -1021,18 +1021,18 @@
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*', // 👈 Listens to ALL modifications (Insert/Updates) from your scan script
           schema: 'public',
           table: 'nfc_scans',
           filter: `claimed_by=eq.${activeId}` 
         },
         async (payload) => {
-          console.log('⚡ Realtime Card Tap Logged! Running server-side logic...');
+          console.log('⚡ Realtime Card Tap Logged! Running server-side logic...', payload);
           
-          // 1. Recalculate challenges visually on the dashboard
+          // 1. Recalculate challenge parameters visually on the dashboard
           await calculateRealChallenges(activeId);
 
-          // 2. Trigger the database RPC function securely to calculate XP and Level increments
+          // 2. Trigger the database RPC function securely to handle background XP increments
           const { error } = await localSupabase.rpc('handle_nfc_tap_xp', { operator_id: activeId });
           
           if (error) {
