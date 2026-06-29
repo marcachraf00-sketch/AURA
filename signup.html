@@ -1,214 +1,242 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AURA - Create Profile</title>
-<style>
-  body {
-    background: #0f172a; 
-    color: #f8fafc;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Network - Initialize Operator Profile</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      letter-spacing: -0.01em;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-  .auth-container {
-    background: rgba(255, 255, 255, 0.01);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 24px;
-    padding: 32px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
-  }
+    .signup-card {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 40px 32px;
+      box-sizing: border-box;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
 
-  h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-    color: #ffffff;
-  }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: #ffffff;
+      text-align: center;
+    }
 
-  .subtitle {
-    color: #94a3b8;
-    font-size: 14px;
-    margin: 0 0 24px 0;
-  }
+    .subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      text-align: center;
+      margin: 0 0 32px 0;
+    }
 
-  label {
-    display: block;
-    font-size: 13px;
-    color: #94a3b8;
-    margin-bottom: 6px;
-    text-align: left;
-  }
+    .form-group {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
 
-  input {
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 16px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: #1e293b;
-    color: white;
-    box-sizing: border-box;
-    font-size: 14px;
-  }
+    label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-  input:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
+    input {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
 
-  .code-group {
-    margin-bottom: 20px;
-    background: rgba(244, 114, 182, 0.02);
-    padding: 12px;
-    border-radius: 16px;
-    border: 1px dashed rgba(244, 114, 182, 0.2);
-  }
+    input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+    }
 
-  .code-input {
-    border-color: rgba(244, 114, 182, 0.3);
-    margin-bottom: 6px;
-  }
-  
-  .code-input:focus {
-    border-color: #f472b6;
-  }
+    input::placeholder {
+      color: #475569;
+    }
 
-  .code-help-text {
-    font-size: 11px;
-    color: #f472b6;
-    text-align: left;
-    margin: 0;
-    padding-left: 2px;
-    display: block;
-  }
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: opacity 0.2s ease;
+    }
 
-  .submit-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    background: #3b82f6;
-    color: white;
-    transition: background 0.2s ease;
-  }
+    .submit-btn:hover {
+      opacity: 0.95;
+    }
 
-  .submit-btn:hover {
-    background: #2563eb;
-  }
-
-  .footer-links {
-    margin-top: 20px;
-    font-size: 13px;
-    color: #64748b;
-  }
-
-  .footer-links a {
-    color: #3b82f6;
-    text-decoration: none;
-  }
-</style>
+    .submit-btn:disabled {
+      background: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
 
-<div class="auth-container">
-  <h1>Create Portal Account</h1>
-  <p class="subtitle">Set up your AURA profile</p>
+<div class="signup-card">
+  <h1>Initialize Operator</h1>
+  <p class="subtitle">Enter your activation signature to link your physical card</p>
 
-  <form id="signup-form" onsubmit="handleUserSignup(event)">
-    
-    <div class="code-group">
-      <label for="invite-code" style="color: #f472b6; font-weight: 600;">Activation Invite Code</label>
-      <input type="text" id="invite-code" class="code-input" placeholder="e.g., AURA-NFC-XXX" required>
-      <small class="code-help-text">🔑 Received manually upon delivery verification payment check.</small>
+  <form id="signup-form">
+    <div class="form-group">
+      <label for="activation-code-input">Activation Code</label>
+      <input type="text" id="activation-code-input" placeholder="e.g., AURA-NFC-002" required autocomplete="off">
     </div>
 
-    <label for="user-name">Full Name</label>
-    <input type="text" id="user-name" placeholder="Ahmed Mohammed" required>
+    <div class="form-group">
+      <label for="signup-username">Matrix Username</label>
+      <input type="text" id="signup-username" placeholder="Choose display name" required autocomplete="username">
+    </div>
 
-    <label for="user-email">Email Address</label>
-    <input type="email" id="user-email" placeholder="name@example.com" required>
+    <div class="form-group">
+      <label for="signup-age">Operator Age</label>
+      <input type="number" id="signup-age" placeholder="Your age (optional)">
+    </div>
 
-    <label for="user-password">Password (Min. 6 characters)</label>
-    <input type="password" id="user-password" placeholder="••••••••" required>
+    <div class="form-group">
+      <label for="signup-email">Secure Email</label>
+      <input type="email" id="signup-email" placeholder="name@domain.com" required autocomplete="email">
+    </div>
 
-    <button type="submit" class="submit-btn">Register Profile Portal</button>
+    <div class="form-group">
+      <label for="signup-password">Security Password</label>
+      <input type="password" id="signup-password" placeholder="Minimum 6 characters" required autocomplete="new-password">
+    </div>
+
+    <button type="submit" id="signup-submit-btn" class="submit-btn">Create Account</button>
   </form>
-
-  <div class="footer-links">
-    Already registered?
-    <a href="index.html" style="color: #64748b;">← Return to Main Page</a>
-  </div>
 </div>
 
+<!-- Supabase SDK JS Bridge -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+(function() {
+  if (!window.supabase) {
+    console.error("Supabase SDK missing from build runtime pipeline.");
+    return;
+  }
+
+  // Active Client Connection Infrastructure
   const localSupabase = window.supabase.createClient(
     'https://zndniherjshrerioqodx.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  async function handleUserSignup(event) {
-    event.preventDefault();
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const username = document.getElementById('signup-username').value.trim();
+    const age = parseInt(document.getElementById('signup-age').value) || null;
+    const activationCode = document.getElementById('activation-code-input').value.trim().toUpperCase();
     
-    const inviteCode = document.getElementById('invite-code').value.trim();
-    const fullName = document.getElementById('user-name').value.trim();
-    const emailStr = document.getElementById('user-email').value;
-    const passwordStr = document.getElementById('user-password').value;
+    const submitBtn = document.getElementById('signup-submit-btn');
+    submitBtn.innerText = "Processing Matrix Setup...";
+    submitBtn.disabled = true;
 
-    const enteredCode = document.getElementById('activation-code-input').value.trim().toUpperCase();
+    try {
+      // Step 1: Validate the code is completely active and untaken
+      const { data: codeData, error: codeError } = await localSupabase
+        .from('invite_codes')
+        .select('*')
+        .eq('code', activationCode)
+        .eq('used', false)
+        .maybeSingle();
 
-const { data: codeData, error: codeError } = await localSupabase
-  .from('invite_codes')
-  .select('*')
-  .eq('code', enteredCode)
-  .eq('used', false)
-  .maybeSingle();
-
-if (codeError || !codeData) {
-  alert("❌ Invalid or already activated code!");
-  return;
-    }
-
-    const { data: authData, error: authError } = await localSupabase.auth.signUp({
-      email: emailStr,
-      password: passwordStr,
-      options: {
-        data: {
-          full_name: fullName
-        }
+      if (codeError || !codeData) {
+        alert("❌ Critical Exception: Activation Code invalid or already claimed.");
+        submitBtn.innerText = "Create Account";
+        submitBtn.disabled = false;
+        return;
       }
-    });
 
-    if (authError) {
-      alert("Registration Error: " + authError.message);
-      return;
-    }
+      // Step 2: Register the login credentials in Supabase Auth Engine
+      const { data: authData, error: authError } = await localSupabase.auth.signUp({
+        email: email,
+        password: password
+      });
 
-    if (authData.user) {
+      if (authError || !authData.user) {
+        alert("❌ Authentication Engine Rejection: " + (authError ? authError.message : "Initialization aborted."));
+        submitBtn.innerText = "Create Account";
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const newUserId = authData.user.id;
+
+      // Step 3: Insert or Upsert the new record inside public.profiles
+      const { error: profileError } = await localSupabase
+        .from('profiles')
+        .upsert({
+          id: newUserId,
+          username: username,
+          age: age,
+          level: 1,
+          xp: 0,
+          interests: [] // Base payload structure array
+        });
+
+      if (profileError) {
+        console.error("Profile row creation failed:", profileError.message);
+        alert("⚠️ Credentials registered, but profile payload entry failed: " + profileError.message);
+      }
+
+      // Step 4: Mark activation code as burned so it cannot be reused
       await localSupabase
         .from('invite_codes')
-        .update({ is_used: true })
-        .eq('code', inviteCode);
+        .update({ used: true, assigned_to: newUserId })
+        .eq('code', activationCode);
 
-      alert("Account created successfully! Welcome to your AURA profile portal.");
-      window.location.href = 'dashboard.html'; 
+      alert("🎉 Matrix Operator Identity Initialized Successfully!");
+      window.location.href = 'profile.html';
+
+    } catch (err) {
+      console.error("Fatal form handler intercept error:", err);
+      alert("System processing exception occurred during submission.");
+    } finally {
+      submitBtn.innerText = "Create Account";
+      submitBtn.disabled = false;
     }
-  }
+  });
+})();
 </script>
-
 </body>
 </html>
