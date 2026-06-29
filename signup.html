@@ -169,16 +169,18 @@
     const emailStr = document.getElementById('user-email').value;
     const passwordStr = document.getElementById('user-password').value;
 
-    const { data: codeData, error: codeError } = await localSupabase
-      .from('invite_codes')
-      .select('*')
-      .eq('code', inviteCode)
-      .eq('is_used', false)
-      .single();
+    const enteredCode = document.getElementById('activation-code-input').value.trim().toUpperCase();
 
-    if (codeError || !codeData) {
-      alert("Verification Failed: Invalid or already used Activation Invite Code. Account creation denied.");
-      return;
+const { data: codeData, error: codeError } = await localSupabase
+  .from('invite_codes')
+  .select('*')
+  .eq('code', enteredCode)
+  .eq('used', false)
+  .maybeSingle();
+
+if (codeError || !codeData) {
+  alert("❌ Invalid or already activated code!");
+  return;
     }
 
     const { data: authData, error: authError } = await localSupabase.auth.signUp({
