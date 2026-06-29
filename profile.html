@@ -1024,7 +1024,7 @@
       .on(
         'postgres_changes',
         {
-          event: '*', 
+          event: 'INSERT', 
           schema: 'public',
           table: 'nfc_scans',
           filter: `claimed_by=eq.${activeId}` 
@@ -1032,14 +1032,36 @@
         async (payload) => {
           console.log('⚡ Realtime Card Tap Logged! Running server-side logic...', payload);
           
+          // 1. Instantly recalculate objectives count
           await calculateRealChallenges(activeId);
 
-          const { error } = await localSupabase.rpc('handle_nfc_tap_xp', { operator_id: activeId });
-          
-          if (error) {
-            console.error("❌ Database Function Execution Failed:", error.message);
-          } else {
-            console.log("✅ Database RPC function executed. Stats updated cleanly!");
+          try {
+            // 2. Fetch latest profile data right out of the DB to ensure fresh numbers
+            const { data: currentProfile, error: fetchError } = await localSupabase
+              .from('profiles')
+              .select('xp')
+              .eq('id', activeId)
+              .single();
+
+            if (fetchError) throw fetchError;
+
+            // 3. Increment current XP by 10 points
+            const currentPoints = currentProfile.xp || 0;
+            const targetNewXp = currentPoints + 10;
+
+            const { error: updateError } = await localSupabase
+              .from('profiles')
+              .update({ xp: targetNewXp })
+              .eq('id', activeId);
+
+            if (updateError) {
+              console.error("❌ Browser Point Injection Failed:", updateError.message);
+            } else {
+              console.log(`✅ Direct Sync Completed! Added 10 XP. Balance: ${targetNewXp} XP`);
+            }
+
+          } catch (internalErr) {
+            console.error("💥 Error during real-time XP assignment:", internalErr.message);
           }
         }
       )
