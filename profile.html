@@ -767,13 +767,11 @@
   async function calculateRealChallenges(userId) {
     if (!userId) return;
     try {
-      const weeklyResetTimestamp = getLastFridayMidnight();
       const { data: scans, error } = await localSupabase
         .from('nfc_scans')
         .select('claimed_at')
         .eq('claimed_by', userId)
-        .eq('claimed', true)
-        .gte('claimed_at', weeklyResetTimestamp);
+        .eq('claimed', true);
 
       if (error) throw error;
       if (!scans || scans.length === 0) {
@@ -781,6 +779,21 @@
         setChallengeProgress('regular', 0);
         return;
       }
+
+      setChallengeProgress('icebreaker', scans.length);
+
+      const uniqueDays = new Set();
+      scans.forEach(scan => {
+        if (scan.claimed_at) {
+          const dateStr = scan.claimed_at.split('T')[0]; 
+          uniqueDays.add(dateStr);
+        }
+      });
+      setChallengeProgress('regular', uniqueDays.size);
+    } catch (err) {
+      console.error("Error evaluating live matrix objectives:", err);
+    }
+  }
 
       setChallengeProgress('icebreaker', scans.length);
 
