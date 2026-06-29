@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Card - Link System</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: #f8fafc;
+            font-family: system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .activation-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        h2 { margin-top: 0; color: #fff; font-size: 24px; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+        label { display: block; text-align: left; font-size: 12px; color: #38bdf8; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #fff; font-size: 16px; box-sizing: border-box; margin-bottom: 20px; }
+        button { width: 100%; padding: 14px; background: #3b82f6; border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #2563eb; }
+        .status-msg { margin-top: 15px; font-size: 14px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div class="activation-card">
+    <h2>Link Aura Vector</h2>
+    <p>Assign a physical NFC card token identifier directly to your operative account framework.</p>
+    
+    <label for="card-id-input">Physical Card Token / Serial</label>
+    <input type="text" id="card-id-input" placeholder="Scan or type Card UID (e.g., 04:A3:2B:1C)">
+    
+    <button id="activate-btn">Sync Card to Identity</button>
+    <div id="status-display" class="status-msg"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const supabaseUrl = 'https://zndniherjshrerioqodx.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo';
+    const clientSupabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    document.getElementById('activate-btn').addEventListener('click', async () => {
+        const cardId = document.getElementById('card-id-input').value.trim();
+        const statusDisplay = document.getElementById('status-display');
+        
+        if (!cardId) {
+            statusDisplay.style.color = '#f43f5e';
+            statusDisplay.innerText = "Please input a valid Card Identification string.";
+            return;
+        }
+
+        statusDisplay.style.color = '#94a3b8';
+        statusDisplay.innerText = "Querying credentials...";
+
+        // 1. Grab the currently logged-in user from Auth session context
+        const { data: { user }, error: authError } = await clientSupabase.auth.getUser();
+
+        if (authError || !user) {
+            statusDisplay.style.color = '#f43f5e';
+            statusDisplay.innerText = "No active session found. Please log in first.";
+            return;
+        }
+
+        // 2. Insert the mapping into your new user_cards table
+        const { error: insertError } = await clientSupabase
+            .from('user_cards')
+            .insert([{ card_id: cardId, user_id: user.id }]);
+
+        if (insertError) {
+            statusDisplay.style.color = '#f43f5e';
+            if (insertError.code === '23505') {
+                statusDisplay.innerText = "Aborted: This card token is already registered.";
+            } else {
+                statusDisplay.innerText = "Sync Error: " + insertError.message;
+            }
+        } else {
+            statusDisplay.style.color = '#34d399';
+            statusDisplay.innerText = "✅ Vector Linked successfully to account!";
+            document.getElementById('card-id-input').value = '';
+        }
+    });
+</script>
+</body>
+</html>
