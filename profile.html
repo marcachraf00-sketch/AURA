@@ -663,7 +663,7 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  let currentUserId = null; // Evaluated dynamically from active authentication token pipeline
+  let currentUserId = null; 
   let currentXP = 0;
   let currentLevel = 1;
   const XP_PER_LEVEL = 200; 
@@ -779,21 +779,6 @@
         setChallengeProgress('regular', 0);
         return;
       }
-
-      setChallengeProgress('icebreaker', scans.length);
-
-      const uniqueDays = new Set();
-      scans.forEach(scan => {
-        if (scan.claimed_at) {
-          const dateStr = scan.claimed_at.split('T')[0]; 
-          uniqueDays.add(dateStr);
-        }
-      });
-      setChallengeProgress('regular', uniqueDays.size);
-    } catch (err) {
-      console.error("Error evaluating live matrix objectives:", err);
-    }
-  }
 
       setChallengeProgress('icebreaker', scans.length);
 
@@ -948,7 +933,6 @@
         document.getElementById('edit-username').value = profData.username || "";
         document.getElementById('edit-age').value = profData.age || "";
         
-        // Connect Live Engine precisely using active identifier token
         initializeRealtimeEngine(currentUserId);
       } else {
         document.getElementById('loading-msg').innerText = "❌ No active session matrix row found.";
@@ -1023,7 +1007,6 @@
     } else {
       document.getElementById('edit-modal').style.display = 'none';
       
-      // Explicit single fetch pull refresh layout parameters
       const { data: updatedData } = await localSupabase.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
       if (updatedData) renderLoadedProfile(updatedData);
     }
@@ -1034,12 +1017,10 @@
     window.location.href = 'index.html';
   });
 
-  // ⚡ DUAL-CHANNEL REALTIME ENGINE (DYNAMIC ALLOCATION) ⚡
   function initializeRealtimeEngine(activeId) {
     if (!activeId) return;
     console.log("⚡ Realtime Engine monitoring Operator Link ID:", activeId);
 
-    // CHANNEL 1: Listen for live level/XP shifts on your active dynamic session profile row
     localSupabase
       .channel('live-profile-changes')
       .on(
@@ -1057,7 +1038,6 @@
       )
       .subscribe();
 
-    // CHANNEL 2: Listen for live raw card inserts targeting your explicit profile identity
     localSupabase
       .channel('live-scan-changes')
       .on(
@@ -1076,7 +1056,6 @@
       .subscribe();
   }
 
-  // Execute initial layout pipeline load completely dynamic
   loadProfile();
 
 })();
