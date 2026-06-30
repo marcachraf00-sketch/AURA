@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AURA Card Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Supabase JS Client library explicitly first -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -36,18 +37,18 @@
     </div>
 
     <script>
-        // 1. Core Supabase Platform Configurations
+        // 1. Initialize variables after scripts are fully parsed
         const SUPABASE_URL = "https://zndniherjshrerioqodx.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.4YmH4l0O_e2S_Q_4Z08O_9_rG2O_w_O_4_O_4_O_4"; 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Correct initialization namespace
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 2. Read parameters directly out of the active URL string
         const urlParams = new URLSearchParams(window.location.search);
         const ownerId = urlParams.get('owner_id');
         const tapSuccess = urlParams.get('tap_success');
         const cooldownActive = urlParams.get('error');
 
-        // 3. UI Status Toast Notification Processor
         const toast = document.getElementById('status-toast');
         if (tapSuccess === 'true') {
             toast.className = "block bg-emerald-500/10 text-emerald-400 border-emerald-500/20 p-4 rounded-xl text-center text-sm font-medium";
@@ -57,44 +58,50 @@
             toast.innerText = "⏳ Cooldown Active: This card can only be tapped once per day.";
         }
 
-        // 4. Fetch User Data Profile Metrics and Calculate Dynamic Level Math
         async function fetchUserProfile() {
             if (!ownerId) {
-                document.getElementById('username-display').innerText = "No User ID Found";
+                document.getElementById('username-display').innerText = "No User ID Provided";
                 return;
             }
 
-            // Pull profile data fields from your profiles database table
-            const { data: profile, error } = await supabase
+            console.log("Fetching profile for ID:", ownerId);
+
+            const { data: profile, error } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', ownerId)
-                .single();
+                .maybeSingle(); // Fallback cleanly if item is missing
 
-            if (error || !profile) {
-                console.error("Error retrieving user data record:", error);
-                document.getElementById('username-display').innerText = "Profile Not Found";
+            if (error) {
+                console.error("Database error details:", error);
+                document.getElementById('username-display').innerText = "Error Loading Profile";
                 return;
             }
 
-            // Fallback checking to identify your dynamic target column name
-            const totalXP = profile.total_xp || profile.xp || profile.points || 0;
+            if (!profile) {
+                console.error("No row matches id:", ownerId);
+                document.getElementById('username-display').innerText = "User Profile Missing";
+                return;
+            }
+
+            console.log("Profile Data Found:", profile);
+
+            // Read variables directly using your exact database keys
+            const totalXP = profile.xp || 0; 
             const username = profile.username || profile.full_name || "Aura User";
             
-            // Dynamic Level Calculation Rules (Each level requires exactly 200 XP)
+            // Dynamic Level Math (200 XP intervals)
             const xpPerLevel = 200;
             const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
             const currentLevelXP = totalXP % xpPerLevel;
             const progressPercentage = (currentLevelXP / xpPerLevel) * 100;
 
-            // Update DOM layout text and style properties
             document.getElementById('username-display').innerText = username;
             document.getElementById('level-display').innerText = `Level ${currentLevel}`;
             document.getElementById('xp-text-display').innerText = `${currentLevelXP} / ${xpPerLevel} XP`;
             document.getElementById('xp-bar-fill').style.width = `${progressPercentage}%`;
         }
 
-        // Start initialization sequence
         fetchUserProfile();
     </script>
 </body>
