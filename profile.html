@@ -776,16 +776,13 @@
 
   // Core Dynamic Math Render Engine
   function updateUI() {
-    // 810 total points / 200 points per level = level 4 + base index 1 = Level 5
     const computedLevel = Math.floor(cumulativeXP / XP_PER_LEVEL) + 1;
     const currentLevelXP = cumulativeXP % XP_PER_LEVEL;
     const progressPercentage = (currentLevelXP / XP_PER_LEVEL) * 100;
 
-    // Display updates directly to the DOM interfaces
     document.getElementById('level-val').innerText = computedLevel;
     document.getElementById('xp-val').innerText = currentLevelXP + " / " + XP_PER_LEVEL + " XP";
     
-    // Smooth geometric layouts fills update
     document.getElementById('level-fill').style.width = "100%"; // Base profile is activated completely
     document.getElementById('xp-fill').style.width = progressPercentage + "%";
   }
