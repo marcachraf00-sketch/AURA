@@ -1,124 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA Card Profile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Profile View</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-6">
-        
-        <div class="text-center space-y-2">
-            <div class="w-24 h-24 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full mx-auto flex items-center justify-center text-3xl font-bold shadow-lg shadow-indigo-500/20">
-                A
-            </div>
-            <h1 id="username-display" class="text-2xl font-extrabold tracking-tight mt-3 text-slate-100">Loading Profile...</h1>
-            <div class="text-sm font-medium text-slate-400">VERIFIED AURA OPERATOR</div>
+  <div id="profile-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative">
+    
+    <div id="status-state" class="flex flex-col items-center justify-center py-8 text-center">
+      <div id="profile-avatar-placeholder" class="w-24 h-24 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-lg shadow-indigo-500/20">
+        A
+      </div>
+      <h2 id="status-title" class="text-2xl font-bold tracking-tight">Loading Profile...</h2>
+      <div id="status-level-badge" class="mt-2 px-3 py-1 bg-slate-800/80 rounded-full text-xs text-slate-400 font-medium">
+        Level --
+      </div>
+      
+      <div class="w-full mt-6">
+        <div class="flex justify-between text-xs text-slate-400 mb-1 font-medium">
+          <span>Level Progress</span>
+          <span id="status-xp-counter">-- / 200 XP</span>
         </div>
-
-        <div class="space-y-2">
-            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Interests Matrix</div>
-            <div class="flex gap-2">
-                <span class="border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-md">[]</span>
-            </div>
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div id="status-xp-bar" class="bg-gradient-to-r from-teal-400 to-emerald-400 h-full w-0 transition-all duration-500"></div>
         </div>
-
-        <div class="flex justify-between items-center border-t border-slate-800/60 pt-4">
-            <span class="text-sm font-semibold text-slate-300">Level</span>
-            <span id="level-display" class="text-sm font-bold text-cyan-400">--</span>
-        </div>
-
-        <div class="space-y-2">
-            <div class="flex justify-between text-sm font-medium">
-                <span class="text-slate-400">XP</span>
-                <span id="xp-text-display" class="text-emerald-400 font-bold">-- / 200 XP</span>
-            </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div id="xp-bar-fill" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-full w-0 transition-all duration-700 ease-out"></div>
-            </div>
-        </div>
-
-        <div id="status-toast" class="hidden p-4 rounded-xl text-center text-sm font-medium border"></div>
-
-        <div class="grid grid-cols-2 gap-3 pt-2">
-            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold py-2.5 px-4 rounded-xl transition text-sm">
-                Edit Profile
-            </button>
-            <button class="bg-slate-800/40 hover:bg-slate-800 text-slate-400 border border-slate-800/80 font-semibold py-2.5 px-4 rounded-xl transition text-sm">
-                Sign Out
-            </button>
-        </div>
-
+      </div>
     </div>
 
-    <script>
-        // 1. System Configurations
-        const SUPABASE_URL = "https://zndniherjshrerioqodx.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo"; 
-        
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <div id="profile-data-state" class="hidden flex flex-col space-y-6">
+      <div class="text-center">
+        <h1 id="profile-username" class="text-3xl font-black tracking-tight text-white mb-1">username</h1>
+        <p class="text-xs uppercase tracking-widest text-slate-400 font-semibold">Verified Aura Operator</p>
+      </div>
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const ownerId = urlParams.get('owner_id');
-        const tapSuccess = urlParams.get('tap_success');
-        const cooldownActive = urlParams.get('error');
+      <div>
+        <p class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">Interests Matrix</p>
+        <div id="interests-container" class="flex flex-wrap gap-2">
+          </div>
+      </div>
 
-        // Status Toast Handler Engine
-        const toast = document.getElementById('status-toast');
-        if (tapSuccess === 'true') {
-            toast.className = "block bg-emerald-500/10 text-emerald-400 border-emerald-500/20 p-4 rounded-xl text-center text-sm font-medium";
-            toast.innerText = "✨ NFC Card Scan Successful! +100 XP added.";
-        } else if (cooldownActive === 'cooldown') {
-            toast.className = "block bg-amber-500/10 text-amber-400 border-amber-500/20 p-4 rounded-xl text-center text-sm font-medium";
-            toast.innerText = "⏳ Cooldown Active: This card can only be tapped once per day.";
+      <div class="border-t border-slate-800/60 pt-4">
+        <div class="flex justify-between items-baseline mb-1">
+          <span class="text-sm font-bold text-slate-300">Level</span>
+          <span id="profile-level" class="text-xl font-black text-sky-400">1</span>
+        </div>
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-2">
+          <div id="profile-xp-bar" class="bg-gradient-to-r from-sky-400 to-blue-500 h-full w-0 transition-all duration-300"></div>
+        </div>
+        <div class="flex justify-between text-xs font-semibold text-emerald-400">
+          <span>XP</span>
+          <span id="profile-xp-counter">0 / 200 XP</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-bold py-2.5 px-4 rounded-xl text-sm transition">
+          Edit Profile
+        </button>
+        <button class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 px-4 rounded-xl text-sm transition">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <div id="notification-toast" class="hidden mt-4 bg-emerald-950/80 border border-emerald-500/30 rounded-xl p-3 text-center transition-all duration-300">
+      <p class="text-xs text-emerald-400 font-semibold flex items-center justify-center gap-1.5">
+        ✨ NFC Card Scan Successful! +100 XP added.
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. SUPABASE CONNECTION CONFIGURATION
+    // ==========================================
+    const SUPABASE_URL = "https://zndniherjshrerioqodx.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo";
+
+    // Initialize Client Connection
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ==========================================
+    // 2. RUN APPLICATION WORKFLOW
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const ownerId = urlParams.get('owner_id');
+      const tapSuccess = urlParams.get('tap_success');
+
+      if (tapSuccess === 'true') {
+        document.getElementById("notification-toast").classList.remove("hidden");
+      }
+
+      if (ownerId) {
+        fetchProfileData(ownerId);
+      } else {
+        showErrorState("No Profile ID Found");
+      }
+    });
+
+    // ==========================================
+    // 3. DATABASE CONTROLLER
+    // ==========================================
+    async function fetchProfileData(id) {
+      console.log(`Fetching profile for ID: ${id}`);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          renderLoadedProfile(data);
+        } else {
+          showErrorState("Profile Not Found");
         }
+      } catch (err) {
+        console.error("Database error details:", err);
+        showErrorState("Error Loading Profile");
+      }
+    }
 
-        async function fetchUserProfile() {
-            if (!ownerId) {
-                document.getElementById('username-display').innerText = "No User ID Provided";
-                return;
-            }
+    // ==========================================
+    // 4. DATA SANITIZATION & DOM RENDERING
+    // ==========================================
+    function renderLoadedProfile(data) {
+      document.getElementById("status-state").classList.add("hidden");
+      document.getElementById("profile-data-state").classList.remove("hidden");
 
-            console.log("Fetching profile profile runtime logs:", ownerId);
+      document.getElementById("profile-username").textContent = data.username || "Anonymous Operator";
+      document.getElementById("profile-level").textContent = data.level || "1";
+      
+      const currentXp = data.xp || 0;
+      const targetXp = 200; 
+      document.getElementById("profile-xp-counter").textContent = `${currentXp} / ${targetXp} XP`;
+      
+      const xpPercentage = Math.min((currentXp / targetXp) * 100, 100);
+      document.getElementById("profile-xp-bar").style.width = `${xpPercentage}%`;
 
-            const { data: profile, error } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', ownerId)
-                .maybeSingle();
+      // --- INTERESTS MATRIX SANITIZATION ---
+      const container = document.getElementById("interests-container");
+      container.innerHTML = ""; 
 
-            if (error) {
-                console.error("Database error details:", error);
-                document.getElementById('username-display').innerText = "Error Loading Profile";
-                return;
-            }
+      let rawInterests = [];
 
-            if (!profile) {
-                console.error("No row matches profile id reference:", ownerId);
-                document.getElementById('username-display').innerText = "User Profile Missing";
-                return;
-            }
-
-            // Correct mathematical properties calculation block
-            const totalXP = profile.xp || 0; 
-            const username = profile.username || profile.full_name || "Aura User";
-            
-            const xpPerLevel = 200;
-            const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
-            const currentLevelXP = totalXP % xpPerLevel;
-            const progressPercentage = (currentLevelXP / xpPerLevel) * 100;
-
-            // DOM Binding Engine Updates
-            document.getElementById('username-display').innerText = username;
-            document.getElementById('level-display').innerText = currentLevel;
-            document.getElementById('xp-text-display').innerText = `${currentLevelXP} / ${xpPerLevel} XP`;
-            document.getElementById('xp-bar-fill').style.width = `${progressPercentage}%`;
+      // Step A: Parse stringified arrays vs normal arrays
+      if (Array.isArray(data.interests)) {
+        rawInterests = data.interests;
+      } else if (typeof data.interests === 'string' && data.interests.trim() !== "") {
+        try {
+          let parsed = JSON.parse(data.interests);
+          if (Array.isArray(parsed)) {
+            rawInterests = parsed;
+          } else {
+            rawInterests = data.interests.split(',');
+          }
+        } catch (e) {
+          rawInterests = data.interests.split(',');
         }
+      }
 
-        fetchUserProfile();
-    </script>
+      // Step B: Regex cleanup to strip: [ ] \ "
+      const cleanInterests = rawInterests
+        .map(item => {
+          if (typeof item === 'string') {
+            return item.replace(/[\[\]\\"]/g, '').trim();
+          }
+          return String(item).trim();
+        })
+        .filter(item => item !== "");
+
+      // Step C: Render clean badge fields
+      if (cleanInterests.length === 0) {
+        container.innerHTML = `<span class="text-xs text-slate-500 italic">No interests specified</span>`;
+      } else {
+        cleanInterests.forEach(interest => {
+          const badge = document.createElement("span");
+          badge.className = "px-3 py-1 bg-sky-950/50 border border-sky-500/20 rounded-xl text-xs font-bold text-sky-400 shadow-sm shadow-sky-500/5";
+          badge.textContent = interest;
+          container.appendChild(badge);
+        });
+      }
+    }
+
+    function showErrorState(message) {
+      document.getElementById("status-title").textContent = message;
+      document.getElementById("profile-avatar-placeholder").className = "w-24 h-24 bg-rose-950 border border-rose-500/30 rounded-full flex items-center justify-center text-3xl font-bold mb-4 text-rose-400";
+      document.getElementById("profile-avatar-placeholder").textContent = "!";
+    }
+  </script>
 </body>
 </html>
