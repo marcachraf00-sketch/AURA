@@ -903,7 +903,6 @@
 
   async function loadProfile(){
     try {
-      // ⚡ SCENARIO A: Fetch ID from URL query parameters instead of auth session
       const urlParams = new URLSearchParams(window.location.search);
       profileOwnerId = urlParams.get('id');
 
@@ -918,7 +917,6 @@
         document.getElementById('edit-username').value = profData.username || "";
         document.getElementById('edit-age').value = profData.age || "";
         
-        // Check if current scanning device is also logged in as the owner
         const { data: { user } } = await localSupabase.auth.getUser();
         if (user && user.id === profileOwnerId) {
           document.getElementById('management-actions').style.display = 'flex';
@@ -977,9 +975,15 @@
       }
     }
 
+    // ⚡ FIX INTERESTS TAG STRING SANITIZER
     selectedInterests = rawInterests
-      .map(item => (typeof item === 'string' ? item.replace(/[\[\]\\"]/g, '').trim() : String(item).trim()))
-      .filter(item => item !== "");
+      .map(item => {
+        if (typeof item === 'string') {
+          return item.replace(/[\\]/g, '').replace(/[\[\]"]/g, '').trim();
+        }
+        return String(item).trim();
+      })
+      .filter(item => item !== "" && item !== "n");
 
     renderInterests(selectedInterests);
     updateUI();
