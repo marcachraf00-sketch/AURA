@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AURA Card Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Supabase JS Client library explicitly first -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -17,31 +16,49 @@
                 A
             </div>
             <h1 id="username-display" class="text-2xl font-extrabold tracking-tight mt-3 text-slate-100">Loading Profile...</h1>
-            <span id="level-display" class="inline-block bg-indigo-500/10 text-indigo-400 text-sm font-semibold px-3 py-1 rounded-full border border-indigo-500/20">
-                Level --
-            </span>
+            <div class="text-sm font-medium text-slate-400">VERIFIED AURA OPERATOR</div>
         </div>
 
         <div class="space-y-2">
-            <div class="flex justify-between text-sm font-medium text-slate-400">
-                <span>Level Progress</span>
-                <span id="xp-text-display">-- / 200 XP</span>
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Interests Matrix</div>
+            <div class="flex gap-2">
+                <span class="border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-md">[]</span>
             </div>
-            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
-                <div id="xp-bar-fill" class="bg-gradient-to-r from-purple-500 to-indigo-500 h-full w-0 transition-all duration-700 ease-out"></div>
+        </div>
+
+        <div class="flex justify-between items-center border-t border-slate-800/60 pt-4">
+            <span class="text-sm font-semibold text-slate-300">Level</span>
+            <span id="level-display" class="text-sm font-bold text-cyan-400">--</span>
+        </div>
+
+        <div class="space-y-2">
+            <div class="flex justify-between text-sm font-medium">
+                <span class="text-slate-400">XP</span>
+                <span id="xp-text-display" class="text-emerald-400 font-bold">-- / 200 XP</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div id="xp-bar-fill" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-full w-0 transition-all duration-700 ease-out"></div>
             </div>
         </div>
 
         <div id="status-toast" class="hidden p-4 rounded-xl text-center text-sm font-medium border"></div>
 
+        <div class="grid grid-cols-2 gap-3 pt-2">
+            <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold py-2.5 px-4 rounded-xl transition text-sm">
+                Edit Profile
+            </button>
+            <button class="bg-slate-800/40 hover:bg-slate-800 text-slate-400 border border-slate-800/80 font-semibold py-2.5 px-4 rounded-xl transition text-sm">
+                Sign Out
+            </button>
+        </div>
+
     </div>
 
     <script>
-        // 1. Initialize variables after scripts are fully parsed
+        // 1. System Configurations
         const SUPABASE_URL = "https://zndniherjshrerioqodx.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo"; 
         
-        // Correct initialization namespace
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -49,6 +66,7 @@
         const tapSuccess = urlParams.get('tap_success');
         const cooldownActive = urlParams.get('error');
 
+        // Status Toast Handler Engine
         const toast = document.getElementById('status-toast');
         if (tapSuccess === 'true') {
             toast.className = "block bg-emerald-500/10 text-emerald-400 border-emerald-500/20 p-4 rounded-xl text-center text-sm font-medium";
@@ -64,13 +82,13 @@
                 return;
             }
 
-            console.log("Fetching profile for ID:", ownerId);
+            console.log("Fetching profile profile runtime logs:", ownerId);
 
             const { data: profile, error } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', ownerId)
-                .maybeSingle(); // Fallback cleanly if item is missing
+                .maybeSingle();
 
             if (error) {
                 console.error("Database error details:", error);
@@ -79,13 +97,12 @@
             }
 
             if (!profile) {
-                console.error("No row matches id:", ownerId);
+                console.error("No row matches profile id reference:", ownerId);
                 document.getElementById('username-display').innerText = "User Profile Missing";
                 return;
             }
 
-            console.log("Profile Data Found:", profile);
-
+            // Correct mathematical properties calculation block
             const totalXP = profile.xp || 0; 
             const username = profile.username || profile.full_name || "Aura User";
             
@@ -94,8 +111,9 @@
             const currentLevelXP = totalXP % xpPerLevel;
             const progressPercentage = (currentLevelXP / xpPerLevel) * 100;
 
+            // DOM Binding Engine Updates
             document.getElementById('username-display').innerText = username;
-            document.getElementById('level-display').innerText = `Level ${currentLevel}`;
+            document.getElementById('level-display').innerText = currentLevel;
             document.getElementById('xp-text-display').innerText = `${currentLevelXP} / ${xpPerLevel} XP`;
             document.getElementById('xp-bar-fill').style.width = `${progressPercentage}%`;
         }
