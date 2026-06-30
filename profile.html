@@ -648,12 +648,12 @@
   );
 
   let currentUserId = null; 
-  let cumulativeXP = 0; // Total absolute point pool from database
+  let cumulativeXP = 0; 
   const XP_PER_LEVEL = 200; 
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
   
   const PRESET_INTERESTS = ["Tech", "Networking", "Marketing", "Design", "Development", "NFC", "AI", "Startup", "HR", "Sourcing", "Media Buying", "Apparel"];
-  let selectedInterests = []; // Array tracking selected interests globally
+  let selectedInterests = []; 
   let tempBase64Avatar = "";
 
   let challengeState = {
@@ -774,17 +774,14 @@
     }
   }
 
-  // Core Dynamic Math Render Engine
   function updateUI() {
     const computedLevel = Math.floor(cumulativeXP / XP_PER_LEVEL) + 1;
     const currentLevelXP = cumulativeXP % XP_PER_LEVEL;
     const progressPercentage = (currentLevelXP / XP_PER_LEVEL) * 100;
 
-    // Display updates directly to the DOM interfaces
     document.getElementById('level-val').innerText = computedLevel;
     document.getElementById('xp-val').innerText = currentLevelXP + " / " + XP_PER_LEVEL + " XP";
     
-    // Smooth geometric layouts fills update
     document.getElementById('level-fill').style.width = "100%"; 
     document.getElementById('xp-fill').style.width = progressPercentage + "%";
   }
@@ -957,11 +954,28 @@
       document.getElementById('user-avatar').src = FALLBACK_AVATAR;
     }
 
+    // --- CLEANUP SERIALIZATION ENGINE ---
+    let rawInterests = [];
     if (Array.isArray(data.interests)) {
-      selectedInterests = data.interests;
+      rawInterests = data.interests;
     } else if (typeof data.interests === 'string' && data.interests.trim() !== "") {
-      selectedInterests = data.interests.split(',');
+      try {
+        let parsed = JSON.parse(data.interests);
+        if (Array.isArray(parsed)) {
+          rawInterests = parsed;
+        } else {
+          rawInterests = data.interests.split(',');
+        }
+      } catch (e) {
+        rawInterests = data.interests.split(',');
+      }
     }
+
+    // Clean backslashes, braces, extra quotes
+    selectedInterests = rawInterests
+      .map(item => (typeof item === 'string' ? item.replace(/[\[\]\\"]/g, '').trim() : String(item).trim()))
+      .filter(item => item !== "");
+
     renderInterests(selectedInterests);
     updateUI();
     calculateRealChallenges(data.id);
