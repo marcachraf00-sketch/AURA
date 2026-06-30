@@ -86,11 +86,9 @@
 
             console.log("Profile Data Found:", profile);
 
-            // Read variables directly using your exact database keys
             const totalXP = profile.xp || 0; 
             const username = profile.username || profile.full_name || "Aura User";
             
-            // Dynamic Level Math (200 XP intervals)
             const xpPerLevel = 200;
             const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
             const currentLevelXP = totalXP % xpPerLevel;
