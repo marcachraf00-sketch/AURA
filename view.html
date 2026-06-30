@@ -56,15 +56,6 @@
           <span id="profile-xp-counter">0 / 200 XP</span>
         </div>
       </div>
-
-      <div class="grid grid-cols-2 gap-3 pt-2">
-        <button class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-bold py-2.5 px-4 rounded-xl text-sm transition">
-          Edit Profile
-        </button>
-        <button class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 px-4 rounded-xl text-sm transition">
-          Sign Out
-        </button>
-      </div>
     </div>
 
     <div id="notification-toast" class="hidden mt-4 bg-emerald-950/80 border border-emerald-500/30 rounded-xl p-3 text-center transition-all duration-300">
@@ -151,7 +142,6 @@
 
       let rawInterests = [];
 
-      // Step A: Parse stringified arrays vs normal arrays
       if (Array.isArray(data.interests)) {
         rawInterests = data.interests;
       } else if (typeof data.interests === 'string' && data.interests.trim() !== "") {
@@ -167,7 +157,6 @@
         }
       }
 
-      // Step B: Regex cleanup to strip: [ ] \ "
       const cleanInterests = rawInterests
         .map(item => {
           if (typeof item === 'string') {
@@ -177,7 +166,6 @@
         })
         .filter(item => item !== "");
 
-      // Step C: Render clean badge fields
       if (cleanInterests.length === 0) {
         container.innerHTML = `<span class="text-xs text-slate-500 italic">No interests specified</span>`;
       } else {
