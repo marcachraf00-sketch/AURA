@@ -73,8 +73,8 @@
     const SUPABASE_URL = "https://zndniherjshrerioqodx.supabase.co"; 
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo";
 
-    // Initialize Client Connection
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Initializing explicitly using window namespace to prevent crash
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ==========================================
     // 2. RUN APPLICATION WORKFLOW
@@ -101,7 +101,7 @@
     async function fetchProfileData(id) {
       console.log(`Fetching profile for ID: ${id}`);
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('profiles')
           .select('*')
           .eq('id', id)
@@ -127,13 +127,16 @@
       document.getElementById("profile-data-state").classList.remove("hidden");
 
       document.getElementById("profile-username").textContent = data.username || "Anonymous Operator";
-      document.getElementById("profile-level").textContent = data.level || "1";
       
-      const currentXp = data.xp || 0;
-      const targetXp = 200; 
-      document.getElementById("profile-xp-counter").textContent = `${currentXp} / ${targetXp} XP`;
-      
-      const xpPercentage = Math.min((currentXp / targetXp) * 100, 100);
+      // --- LIVE CALCULATED MATH ENGINE ---
+      const totalXP = data.xp || 0;
+      const xpPerLevel = 200;
+      const computedLevel = Math.floor(totalXP / xpPerLevel) + 1;
+      const currentLevelXP = totalXP % xpPerLevel;
+      const xpPercentage = Math.min((currentLevelXP / xpPerLevel) * 100, 100);
+
+      document.getElementById("profile-level").textContent = computedLevel;
+      document.getElementById("profile-xp-counter").textContent = `${currentLevelXP} / ${xpPerLevel} XP`;
       document.getElementById("profile-xp-bar").style.width = `${xpPercentage}%`;
 
       // --- INTERESTS MATRIX SANITIZATION ---
