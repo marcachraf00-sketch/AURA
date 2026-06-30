@@ -648,8 +648,7 @@
   );
 
   let currentUserId = null; 
-  let currentXP = 0;
-  let currentLevel = 1;
+  let cumulativeXP = 0; // Total absolute point pool from database
   const XP_PER_LEVEL = 200; 
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
   
@@ -775,11 +774,20 @@
     }
   }
 
+  // Core Dynamic Math Render Engine
   function updateUI() {
-    document.getElementById('level-val').innerText = currentLevel;
-    document.getElementById('xp-val').innerText = currentXP + " / " + XP_PER_LEVEL + " XP";
-    document.getElementById('level-fill').style.width = Math.min((currentLevel / 100) * 100, 100) + "%";
-    document.getElementById('xp-fill').style.width = Math.min((currentXP / XP_PER_LEVEL) * 100, 100) + "%";
+    // 810 total points / 200 points per level = level 4 + base index 1 = Level 5
+    const computedLevel = Math.floor(cumulativeXP / XP_PER_LEVEL) + 1;
+    const currentLevelXP = cumulativeXP % XP_PER_LEVEL;
+    const progressPercentage = (currentLevelXP / XP_PER_LEVEL) * 100;
+
+    // Display updates directly to the DOM interfaces
+    document.getElementById('level-val').innerText = computedLevel;
+    document.getElementById('xp-val').innerText = currentLevelXP + " / " + XP_PER_LEVEL + " XP";
+    
+    // Smooth geometric layouts fills update
+    document.getElementById('level-fill').style.width = "100%"; // Base profile is activated completely
+    document.getElementById('xp-fill').style.width = progressPercentage + "%";
   }
 
   function renderInterests(interestsArray) {
@@ -928,12 +936,12 @@
   }
 
   function renderLoadedProfile(data) {
-    if ((data.xp && data.xp > currentXP) || (data.level && data.level > currentLevel)) {
+    const incomingXP = data.xp || 0;
+    if (incomingXP > cumulativeXP && cumulativeXP !== 0) {
       triggerCelebrationBurst();
     }
 
-    currentLevel = data.level || 1;
-    currentXP = data.xp || 0;
+    cumulativeXP = incomingXP;
     document.getElementById('name').innerText = data.username || "Operator Matrix";
     
     if (data.age) {
@@ -1012,8 +1020,7 @@
         },
         (payload) => {
           console.log('⚡ Profile updated in database! Syncing UI elements...', payload.new);
-          currentLevel = payload.new.level || 1;
-          currentXP = payload.new.xp || 0;
+          cumulativeXP = payload.new.xp || 0;
           updateUI();
         }
       )
