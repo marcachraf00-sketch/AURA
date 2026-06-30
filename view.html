@@ -1,307 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aura Profile</title>
-
-<style>
-  body {
-    background: #0f172a;
-    color: #f8fafc;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    letter-spacing: -0.01em;
-    position: relative;
-    overflow-x: hidden;
-    user-select: none;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-
-  .bg-fullscreen {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    object-fit: cover; z-index: -2;
-  }
-
-  .bg-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    z-index: -1;
-  }
-
-  .profile-card {
-    width: 100%;
-    max-width: 340px;
-    text-align: center;
-    padding: 40px 24px;
-    box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
-    backdrop-filter: blur(10px);
-  }
-
-  .avatar-container {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 20px auto;
-  }
-
-  .profile-pic {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(56, 189, 248, 0.4);
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-  }
-
-  h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 6px 0;
-    color: #ffffff;
-  }
-
-  .age-badge {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.07);
-    padding: 3px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    color: #94a3b8;
-    margin-bottom: 16px;
-    font-weight: 500;
-  }
-
-  .subtitle {
-    font-size: 12px;
-    font-weight: 700;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin: 0 0 32px 0;
-  }
-
-  .subtitle.nfc-active {
-    color: #00ff88;
-  }
-
-  .interests-section {
-    text-align: left;
-    margin-bottom: 32px;
-  }
-
-  .interests-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #64748b;
-    font-weight: 700;
-    margin-bottom: 10px;
-    display: block;
-  }
-
-  .interests-box {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .interest-tag {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    color: #38bdf8;
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-
-  .stats-container {
-    width: 100%;
-    text-align: left;
-  }
-
-  .stat-item {
-    margin-bottom: 20px;
-  }
-
-  .stat-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 14px;
-  }
-
-  .stat-label { color: #cbd5e1; }
-  .stat-value { font-weight: 600; color: #38bdf8; }
-
-  .progress-bar-bg {
-    width: 100%; height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #0284c7, #38bdf8);
-    width: 0%;
-    transition: width 1s ease;
-  }
-
-  #loading-msg {
-    font-size: 14px;
-    color: #94a3b8;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA Card Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-<img src="logo.png" alt="Background" class="bg-fullscreen">
-<div class="bg-overlay"></div>
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-6">
+        
+        <div class="text-center space-y-2">
+            <div class="w-24 h-24 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full mx-auto flex items-center justify-center text-3xl font-bold shadow-lg shadow-indigo-500/20">
+                A
+            </div>
+            <h1 id="username-display" class="text-2xl font-extrabold tracking-tight mt-3 text-slate-100">Loading Profile...</h1>
+            <span id="level-display" class="inline-block bg-indigo-500/10 text-indigo-400 text-sm font-semibold px-3 py-1 rounded-full border border-indigo-500/20">
+                Level --
+            </span>
+        </div>
 
-<div id="loading-msg">Accessing matrix card profile...</div>
+        <div class="space-y-2">
+            <div class="flex justify-between text-sm font-medium text-slate-400">
+                <span>Level Progress</span>
+                <span id="xp-text-display">-- / 200 XP</span>
+            </div>
+            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
+                <div id="xp-bar-fill" class="bg-gradient-to-r from-purple-500 to-indigo-500 h-full w-0 transition-all duration-700 ease-out"></div>
+            </div>
+        </div>
 
-<div class="profile-card" id="profile-content" style="display: none;">
-  <div class="avatar-container">
-    <img id="user-avatar" src="" alt="Avatar" class="profile-pic">
-  </div>
+        <div id="status-toast" class="hidden p-4 rounded-xl text-center text-sm font-medium border"></div>
 
-  <h1 id="name">---</h1>
-  <div id="age-display" class="age-badge" style="display: none;"></div>
-  <p class="subtitle" id="status-sub">Aura Network Link Verified</p>
-
-  <div class="interests-section">
-    <span class="interests-label">Interests Matrix</span>
-    <div id="interests-container" class="interests-box"></div>
-  </div>
-
-  <div class="stats-container">
-    <div class="stat-item">
-      <div class="stat-info">
-        <span class="stat-label">Operator Level</span>
-        <span class="stat-value" id="level-val">1</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="level-fill"></div>
-      </div>
     </div>
-  </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function() {
-  if (!window.supabase) return;
+    <script>
+        // 1. Core Supabase Platform Configurations
+        const SUPABASE_URL = "https://zndniherjshrerioqodx.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.4YmH4l0O_e2S_Q_4Z08O_9_rG2O_w_O_4_O_4_O_4"; 
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const localSupabase = window.supabase.createClient(
-    'https://zndniherjshrerioqodx.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
-  );
+        // 2. Read parameters directly out of the active URL string
+        const urlParams = new URLSearchParams(window.location.search);
+        const ownerId = urlParams.get('owner_id');
+        const tapSuccess = urlParams.get('tap_success');
+        const cooldownActive = urlParams.get('error');
 
-  async function loadGuestView() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const ownerId = urlParams.get('owner_id') || "21f3064f-60af-4909-b751-2446033af104"; // Default fallback tracking ID
-    const sub = document.getElementById('status-sub');
+        // 3. UI Status Toast Notification Processor
+        const toast = document.getElementById('status-toast');
+        if (tapSuccess === 'true') {
+            toast.className = "block bg-emerald-500/10 text-emerald-400 border-emerald-500/20 p-4 rounded-xl text-center text-sm font-medium";
+            toast.innerText = "✨ NFC Card Scan Successful! +100 XP added.";
+        } else if (cooldownActive === 'cooldown') {
+            toast.className = "block bg-amber-500/10 text-amber-400 border-amber-500/20 p-4 rounded-xl text-center text-sm font-medium";
+            toast.innerText = "⏳ Cooldown Active: This card can only be tapped once per day.";
+        }
 
-    if (!ownerId) {
-      document.getElementById('loading-msg').innerText = "❌ Missing Operator Link Signature.";
-      return;
-    }
+        // 4. Fetch User Data Profile Metrics and Calculate Dynamic Level Math
+        async function fetchUserProfile() {
+            if (!ownerId) {
+                document.getElementById('username-display').innerText = "No User ID Found";
+                return;
+            }
 
-    try {
-      // 1. Log the scan entry into nfc_scans to advance challenges instantly
-      // We omit 'id' completely so Postgres safely generates a fresh unique ID automatically
-      const { error: scanError } = await localSupabase
-        .from('nfc_scans')
-        .insert([
-          {
-            claimed: true,
-            claimed_by: ownerId,
-            claimed_at: new Date().toISOString()
-          }
-        ]);
+            // Pull profile data fields from your profiles database table
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', ownerId)
+                .single();
 
-      if (scanError) {
-        console.error("🔒 Challenge metric logging blocked by system:", scanError.message);
-      } else {
-        console.log("⚡ Scan successfully logged to nfc_scans table.");
-      }
+            if (error || !profile) {
+                console.error("Error retrieving user data record:", error);
+                document.getElementById('username-display').innerText = "Profile Not Found";
+                return;
+            }
 
-      // 2. Trigger the shared public procedure function to deposit +20 XP
-      const { error: rpcError } = await localSupabase.rpc('increment_xp', { user_id: ownerId, xp_to_add: 20 });
-      
-      if (!rpcError) {
-        sub.innerText = "⚡ Secure NFC Tap Verified: +20 XP Added!";
-        sub.classList.add('nfc-active');
-      } else {
-        console.error("🔒 XP update error:", rpcError.message);
-      }
+            // Fallback checking to identify your dynamic target column name
+            const totalXP = profile.total_xp || profile.xp || profile.points || 0;
+            const username = profile.username || profile.full_name || "Aura User";
+            
+            // Dynamic Level Calculation Rules (Each level requires exactly 200 XP)
+            const xpPerLevel = 200;
+            const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
+            const currentLevelXP = totalXP % xpPerLevel;
+            const progressPercentage = (currentLevelXP / xpPerLevel) * 100;
 
-      // 3. Fetch the updated real profile data strictly
-      const { data: profData, error: profileError } = await localSupabase
-        .from('profiles')
-        .select('*')
-        .eq('id', ownerId)
-        .maybeSingle();
-      
-      if (profileError || !profData) {
-        document.getElementById('loading-msg').innerText = "❌ Profile Signature Not Found in Database.";
-        return;
-      }
+            // Update DOM layout text and style properties
+            document.getElementById('username-display').innerText = username;
+            document.getElementById('level-display').innerText = `Level ${currentLevel}`;
+            document.getElementById('xp-text-display').innerText = `${currentLevelXP} / ${xpPerLevel} XP`;
+            document.getElementById('xp-bar-fill').style.width = `${progressPercentage}%`;
+        }
 
-      // 4. Render real profile parameters to screen securely
-      document.getElementById('name').innerText = profData.username || "Anonymous Operator";
-      document.getElementById('level-val').innerText = profData.level || 1;
-      document.getElementById('level-fill').style.width = Math.min(((profData.level || 1) / 100) * 100, 100) + "%";
-
-      if (profData.age) {
-        document.getElementById('age-display').innerText = "Age: " + profData.age;
-        document.getElementById('age-display').style.display = 'inline-block';
-      }
-
-      document.getElementById('user-avatar').src = profData.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=Unknown";
-
-      // Render tags matrix
-      const tagsContainer = document.getElementById('interests-container');
-      const interests = Array.isArray(profData.interests) ? profData.interests : (profData.interests ? profData.interests.split(',') : []);
-      
-      if (interests.length === 0) {
-        tagsContainer.innerHTML = '<span style="color:#475569; font-style:italic; font-size:13px;">No matrix parameters initialized.</span>';
-      } else {
-        interests.forEach(t => {
-          if (t.trim()) {
-            const span = document.createElement('span');
-            span.className = 'interest-tag';
-            span.innerText = t.trim();
-            tagsContainer.appendChild(span);
-          }
-        });
-      }
-
-      // Flip layouts
-      document.getElementById('loading-msg').style.display = 'none';
-      document.getElementById('profile-content').style.display = 'block';
-
-    } catch (e) {
-      console.error(e);
-      document.getElementById('loading-msg').innerText = "❌ Core network sync failure.";
-    }
-  }
-
-  loadGuestView();
-})();
-</script>
+        // Start initialization sequence
+        fetchUserProfile();
+    </script>
 </body>
 </html>
