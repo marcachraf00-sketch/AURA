@@ -653,6 +653,7 @@
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
   
   const PRESET_INTERESTS = ["Tech", "Networking", "Marketing", "Design", "Development", "NFC", "AI", "Startup", "HR", "Sourcing", "Media Buying", "Apparel"];
+  let selectedInterests = []; // Array tracking selected interests globally
   let tempBase64Avatar = "";
 
   let challengeState = {
@@ -775,7 +776,6 @@
 
   // Core Dynamic Math Render Engine
   function updateUI() {
-    // 810 total points / 200 points per level = level 4 + base index 1 = Level 5
     const computedLevel = Math.floor(cumulativeXP / XP_PER_LEVEL) + 1;
     const currentLevelXP = cumulativeXP % XP_PER_LEVEL;
     const progressPercentage = (currentLevelXP / XP_PER_LEVEL) * 100;
@@ -785,7 +785,7 @@
     document.getElementById('xp-val').innerText = currentLevelXP + " / " + XP_PER_LEVEL + " XP";
     
     // Smooth geometric layouts fills update
-    document.getElementById('level-fill').style.width = "100%"; // Base profile is activated completely
+    document.getElementById('level-fill').style.width = "100%"; 
     document.getElementById('xp-fill').style.width = progressPercentage + "%";
   }
 
@@ -1038,11 +1038,9 @@
         async (payload) => {
           console.log('⚡ Realtime Card Tap Logged! Running server-side logic...', payload);
           
-          // 1. Instantly recalculate objectives count
           await calculateRealChallenges(activeId);
 
           try {
-            // 2. Fetch latest profile data right out of the DB to ensure fresh numbers
             const { data: currentProfile, error: fetchError } = await localSupabase
               .from('profiles')
               .select('xp')
@@ -1051,7 +1049,6 @@
 
             if (fetchError) throw fetchError;
 
-            // 3. Increment current XP by 10 points
             const currentPoints = currentProfile.xp || 0;
             const targetNewXp = currentPoints + 10;
 
