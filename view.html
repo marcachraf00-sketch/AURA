@@ -568,7 +568,7 @@
       </div>
     </div>
 
-    <div class="btn-group">
+    <div class="btn-group" id="management-actions" style="display: none;">
       <button class="primary-btn" id="edit-profile-btn">Edit Profile</button>
       <button id="logout-btn">Sign Out</button>
     </div>
@@ -647,7 +647,7 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZG5paGVyanNocmVyaW9xb2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTE4MTgsImV4cCI6MjA5Nzg2NzgxOH0.WM0zBNAKI9vniV174I99FmEBQ25gB8hti2ZeoshUMTo'
   );
 
-  let currentUserId = null; 
+  let profileOwnerId = null; 
   let cumulativeXP = 0; 
   const XP_PER_LEVEL = 200; 
   const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts/svg?seed=UnknownOperator";
@@ -903,23 +903,30 @@
 
   async function loadProfile(){
     try {
-      const { data:{user} } = await localSupabase.auth.getUser();
-      if (!user) {
-        window.location.href = 'index.html';
+      // ⚡ SCENARIO A: Fetch ID from URL query parameters instead of auth session
+      const urlParams = new URLSearchParams(window.location.search);
+      profileOwnerId = urlParams.get('id');
+
+      if (!profileOwnerId) {
+        document.getElementById('loading-msg').innerText = "❌ Missing Profile Key Parameter (?id=...)";
         return;
       }
-      
-      currentUserId = user.id;
 
-      const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
+      const { data: profData } = await localSupabase.from('profiles').select('*').eq('id', profileOwnerId).maybeSingle();
       if (profData) {
         renderLoadedProfile(profData);
         document.getElementById('edit-username').value = profData.username || "";
         document.getElementById('edit-age').value = profData.age || "";
         
-        initializeRealtimeEngine(currentUserId);
+        // Check if current scanning device is also logged in as the owner
+        const { data: { user } } = await localSupabase.auth.getUser();
+        if (user && user.id === profileOwnerId) {
+          document.getElementById('management-actions').style.display = 'flex';
+        }
+
+        initializeRealtimeEngine(profileOwnerId);
       } else {
-        document.getElementById('loading-msg').innerText = "❌ No active session matrix row found.";
+        document.getElementById('loading-msg').innerText = "❌ Profile vector could not be extracted from matrix.";
         return;
       }
 
@@ -993,7 +1000,7 @@
     const ageVal = parseInt(document.getElementById('edit-age').value) || null;
 
     const { error } = await localSupabase.from('profiles').upsert({
-      id: currentUserId, 
+      id: profileOwnerId, 
       username: nameVal,
       age: ageVal,
       avatar_url: tempBase64Avatar,
@@ -1005,7 +1012,7 @@
       alert("Profile Sync Failed: " + error.message);
     } else {
       document.getElementById('edit-modal').style.display = 'none';
-      const { data: updatedData } = await localSupabase.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
+      const { data: updatedData } = await localSupabase.from('profiles').select('*').eq('id', profileOwnerId).maybeSingle();
       if (updatedData) renderLoadedProfile(updatedData);
     }
   });
