@@ -909,7 +909,6 @@
       const urlParams = new URLSearchParams(window.location.search);
       profileOwnerId = urlParams.get('id');
 
-      // Alternative direct string parser logic to catch hidden link patterns on mobile views
       if (!profileOwnerId && currentUrl.includes('id=')) {
         profileOwnerId = currentUrl.split('id=')[1].split('&')[0];
       }
@@ -947,6 +946,8 @@
 
   function renderLoadedProfile(data) {
     const incomingXP = data.xp || 0;
+    
+    // Only fire confetti if XP has explicitly increased, avoiding spam on initialization
     if (incomingXP > cumulativeXP && cumulativeXP !== 0) {
       triggerCelebrationBurst();
     }
@@ -1038,6 +1039,7 @@
     if (!activeId) return;
     console.log("⚡ Realtime Engine monitoring Operator Link ID:", activeId);
 
+    // Channel 1: Listen for direct updates to the profile row (like when server-side triggers award XP)
     localSupabase
       .channel('live-profile-changes')
       .on(
@@ -1050,12 +1052,14 @@
         },
         (payload) => {
           console.log('⚡ Profile updated in database! Syncing UI elements...', payload.new);
-          cumulativeXP = payload.new.xp || 0;
-          updateUI();
+          
+          // Re-render the loaded profile information safely to trigger confetti and progress updates
+          renderLoadedProfile(payload.new);
         }
       )
       .subscribe();
 
+    // Channel 2: Listen for card scan logging to dynamically calculate objectives counter
     localSupabase
       .channel('live-scan-changes')
       .on(
@@ -1067,41 +1071,14 @@
           filter: `claimed_by=eq.${activeId}` 
         },
         async (payload) => {
-          console.log('⚡ Realtime Card Tap Logged! Processing workflow...', payload);
+          console.log('⚡ Realtime Card Tap Logged! Processing updates...', payload);
+          // Recalculate objectives progress text and bars dynamically
           await calculateRealChallenges(activeId);
-
-          try {
-            const { data: currentProfile, error: fetchError } = await localSupabase
-              .from('profiles')
-              .select('xp')
-              .eq('id', activeId)
-              .single();
-
-            if (fetchError) throw fetchError;
-
-            const currentPoints = currentProfile.xp || 0;
-            const targetNewXp = currentPoints + 10;
-
-            const { error: updateError } = await localSupabase
-              .from('profiles')
-              .update({ xp: targetNewXp })
-              .eq('id', activeId);
-
-            if (updateError) {
-              console.error("❌ Browser Point Injection Failed:", updateError.message);
-            } else {
-              console.log(`✅ Direct Sync Completed! Added 10 XP. Balance: ${targetNewXp} XP`);
-            }
-
-          } catch (internalErr) {
-            console.error("💥 Error during real-time XP assignment:", internalErr.message);
-          }
         }
       )
       .subscribe();
   }
 
-  // Safe DOM layout execution tracker
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadProfile);
   } else {
