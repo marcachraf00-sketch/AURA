@@ -723,6 +723,8 @@
     const txtEl = document.getElementById(ch.txtId);
     const itemEl = document.getElementById(ch.key);
 
+    if (!fillEl || !txtEl || !itemEl) return;
+
     const pct = (ch.current / ch.target) * 100;
     fillEl.style.width = pct + "%";
     txtEl.innerText = ch.current + " / " + ch.target + (ch.suffix || "");
@@ -903,8 +905,14 @@
 
   async function loadProfile(){
     try {
+      const currentUrl = window.location.href;
       const urlParams = new URLSearchParams(window.location.search);
       profileOwnerId = urlParams.get('id');
+
+      // Alternative direct string parser logic to catch hidden link patterns on mobile views
+      if (!profileOwnerId && currentUrl.includes('id=')) {
+        profileOwnerId = currentUrl.split('id=')[1].split('&')[0];
+      }
 
       if (!profileOwnerId) {
         document.getElementById('loading-msg').innerText = "❌ Missing Profile Key Parameter (?id=...)";
@@ -930,6 +938,7 @@
 
     } catch (err) {
       console.error(err);
+      document.getElementById('loading-msg').innerText = "❌ Error establishing handshake with cloud cluster.";
     }
     document.getElementById('loading-msg').style.display = 'none';
     document.getElementById('profile-content').style.display = 'block';
@@ -975,7 +984,6 @@
       }
     }
 
-    // ⚡ FIX INTERESTS TAG STRING SANITIZER
     selectedInterests = rawInterests
       .map(item => {
         if (typeof item === 'string') {
@@ -1059,8 +1067,7 @@
           filter: `claimed_by=eq.${activeId}` 
         },
         async (payload) => {
-          console.log('⚡ Realtime Card Tap Logged (Event type: ' + payload.eventType + ')! Processing workflow...', payload);
-          
+          console.log('⚡ Realtime Card Tap Logged! Processing workflow...', payload);
           await calculateRealChallenges(activeId);
 
           try {
@@ -1094,7 +1101,12 @@
       .subscribe();
   }
 
-  loadProfile();
+  // Safe DOM layout execution tracker
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadProfile);
+  } else {
+    loadProfile();
+  }
 
 })();
 </script>
